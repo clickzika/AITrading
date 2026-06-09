@@ -1,0 +1,18 @@
+strategy: grid_btcusd
+symbol: BTCUSD
+timeframe: H1
+description: "Grid trading on BTCUSD — fixed spacing both directions"
+type: grid
+
+grid:
+  direction: both
+  levels: 10
+  spacing_usd: 500
+  base_lot: 0.01
+
+risk:
+  method: fixed_lot
+  lot_size: 0.01
+  max_daily_loss_usd: 300
+  max_open_positions: 10
+  max_lot_size: 0.1
