@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Plan — AITrading</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--bg-page:#f5f7fa;--bg-header:#fff;--bg-sidebar:#f0f2f5;--bg-content:#fff;--bg-card:#f8f9fb;--bg-hover:#e8ebf0;--accent:#e94560;--text:#1a1a2e;--text-dim:#5a6578;--text-muted:#8493a8;--border:#d8dde4;--s1:#3b82f6;--s2:#8b5cf6;--s3:#f59e0b;--s4:#10b981;--s5:#ef4444;--s6:#f97316;--header-h:64px;--sidebar-w:280px;--code-bg:#f1f5f9;--shadow:0 1px 3px rgba(0,0,0,.06)}
+  [data-theme=dark]{--bg-page:#0f0f23;--bg-header:#1a1a2e;--bg-sidebar:#16213e;--bg-content:#1e1e3a;--bg-card:#252547;--bg-hover:#0f3460;--text:#eee;--text-dim:#94a3b8;--text-muted:#64748b;--border:#1e3a5f;--code-bg:#0d0d1a;--shadow:0 1px 3px rgba(0,0,0,.3)}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-page);color:var(--text);height:100vh;overflow:hidden}
+  .doc-header{position:fixed;top:0;left:0;right:0;height:var(--header-h);background:var(--bg-header);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 32px;z-index:100;box-shadow:var(--shadow)}
+  .dhl{display:flex;align-items:center;gap:16px}.logo{width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
+  .dht-p{font-size:18px;font-weight:700}.dht-d{font-size:12px;color:var(--text-dim)}
+  .dhr{display:flex;align-items:center;gap:12px}.meta{text-align:right;font-size:12px;color:var(--text-dim)}
+  .sbadge{padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600;text-transform:uppercase;background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)}
+  .tgl{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+  .tgl-t{width:44px;height:24px;background:#e2e6eb;border-radius:12px;position:relative;border:1px solid var(--border)}
+  [data-theme=dark] .tgl-t{background:#1e3a5f}
+  .tgl-k{width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:2px;left:3px;transition:transform .3s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+  [data-theme=dark] .tgl-k{transform:translateX(20px);background:var(--accent)}
+  .sidebar{position:fixed;top:var(--header-h);left:0;bottom:0;width:var(--sidebar-w);background:var(--bg-sidebar);border-right:1px solid var(--border);overflow-y:auto;padding:20px 0;z-index:50}
+  .stitle{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);padding:0 20px 12px;border-bottom:1px solid var(--border);margin-bottom:8px}
+  .toc{list-style:none}.toc a{display:flex;align-items:center;gap:10px;padding:8px 20px;color:var(--text-dim);text-decoration:none;font-size:13px;font-weight:500;border-left:3px solid transparent;transition:all .15s}
+  .toc a:hover,.toc a.active{background:var(--bg-hover);color:var(--text);border-left-color:var(--accent)}
+  .toc a.active{background:rgba(233,69,96,.1);color:var(--accent)}
+  .tnum{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+  .s1{background:#3b82f6}.s2{background:#8b5cf6}.s3{background:#f59e0b}.s4{background:#10b981}.s5{background:#ef4444}.s6{background:#f97316}
+  .content{margin-left:var(--sidebar-w);margin-top:var(--header-h);height:calc(100vh - var(--header-h));overflow-y:auto;padding:40px 48px 80px;background:var(--bg-content)}
+  .content::-webkit-scrollbar{width:6px}.content::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px}
+  .sh{display:flex;align-items:center;gap:14px;margin:48px 0 20px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+  .sh:first-child{margin-top:0}
+  .snum{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;font-size:14px;font-weight:800;color:#fff;flex-shrink:0}
+  .stit{font-size:22px;font-weight:700;letter-spacing:-.3px}
+  h3{font-size:16px;font-weight:600;margin:28px 0 12px;border-left:3px solid var(--accent);padding-left:12px}
+  h4{font-size:14px;font-weight:600;color:var(--text-dim);margin:18px 0 8px}
+  p{color:var(--text-dim);margin-bottom:16px;font-size:14px;line-height:1.7}
+  table{width:100%;border-collapse:collapse;margin:16px 0 24px;font-size:13px;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+  thead th{background:var(--bg-sidebar);color:var(--text);font-weight:600;text-align:left;padding:12px 16px;font-size:12px;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--accent)}
+  tbody tr{border-bottom:1px solid var(--border)}
+  tbody tr:nth-child(even){background:rgba(0,0,0,.02)}
+  [data-theme=dark] tbody tr:nth-child(even){background:rgba(255,255,255,.02)}
+  td{padding:10px 16px;color:var(--text-dim);vertical-align:top}
+  ul,ol{margin:8px 0 16px 24px;color:var(--text-dim);font-size:14px}
+  li{margin-bottom:6px;line-height:1.6}
+  .epic{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin:16px 0 24px}
+  .epic-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .epic-title{font-size:15px;font-weight:700}
+  .epic-badge{padding:3px 12px;border-radius:12px;font-size:12px;font-weight:600}
+  .e1{background:rgba(59,130,246,.15);color:#3b82f6}.e2{background:rgba(139,92,246,.15);color:#8b5cf6}.e3{background:rgba(249,115,22,.15);color:#f97316}
+  .issue-list{display:flex;flex-direction:column;gap:6px}
+  .issue{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid var(--border)}
+  [data-theme=light] .issue{background:rgba(0,0,0,.02)}
+  .issue-label{font-size:12px;padding:1px 8px;border-radius:6px;font-weight:600}
+  .feat{background:rgba(59,130,246,.15);color:#3b82f6}.bug{background:rgba(239,68,68,.15);color:#ef4444}.infra{background:rgba(16,185,129,.15);color:#10b981}.chore{background:rgba(100,116,139,.1);color:#94a3b8}
+  .issue-text{font-size:13px;color:var(--text-dim);flex:1}
+  .issue-pts{font-size:11px;font-weight:600;color:var(--text-muted)}
+  @media print{.doc-header{position:static}.sidebar{display:none}.content{margin-left:0;height:auto;overflow:visible;padding:20px}body{background:#fff;overflow:auto}.tgl{display:none}}
+</style>
+</head>
+<body>
+<header class="doc-header">
+  <div class="dhl">
+    <div class="logo">AT</div>
+    <div><div class="dht-p">AITrading</div><div class="dht-d">Project Plan</div></div>
+  </div>
+  <div class="dhr">
+    <div class="meta"><div>Version 1.0 · 2026-06-09</div></div>
+    <span class="sbadge">● Draft</span>
+    <div class="tgl" onclick="toggleTheme()"><span id="ti">☀</span><div class="tgl-t"><div class="tgl-k"></div></div></div>
+  </div>
+</header>
+<nav class="sidebar">
+  <div class="stitle">Contents</div>
+  <ul class="toc">
+    <li><a href="#s1" class="active"><span class="tnum s1">1</span> Overview</a></li>
+    <li><a href="#s2"><span class="tnum s2">2</span> Milestones</a></li>
+    <li><a href="#s3"><span class="tnum s3">3</span> Phase 1 Issues</a></li>
+    <li><a href="#s4"><span class="tnum s4">4</span> Phase 2 Issues</a></li>
+    <li><a href="#s5"><span class="tnum s5">5</span> Phase 3 Issues</a></li>
+    <li><a href="#s6"><span class="tnum s6">6</span> Definition of Done</a></li>
+  </ul>
+</nav>
+<main class="content">
+
+  <div class="sh" id="s1"><span class="snum s1">1</span><h2 class="stit">Overview</h2></div>
+  <p>AITrading development follows the devstarter SDLC gate model. Feature development occurs in Gate 4, split into 3 phases. All issues tracked on GitHub Issues with milestones per phase. Solo developer (clickzika).</p>
+  <table>
+    <thead><tr><th>Phase</th><th>Focus</th><th>Est. Duration</th><th>Milestone</th></tr></thead>
+    <tbody>
+      <tr><td>Gate 3</td><td>Foundation: scaffold + Docker + GitHub Issues</td><td>1 week</td><td>v0.1-foundation</td></tr>
+      <tr><td>Phase 1</td><td>Analysis engine + MT5 feed + OHLCV storage</td><td>3-4 weeks</td><td>v0.2-analysis</td></tr>
+      <tr><td>Phase 2</td><td>Strategy engine + auto-execution + risk manager</td><td>4-5 weeks</td><td>v0.3-autotrading</td></tr>
+      <tr><td>Phase 3</td><td>Dashboard + WebSocket + Claude AI co-pilot</td><td>3-4 weeks</td><td>v1.0-dashboard</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sh" id="s2"><span class="snum s2">2</span><h2 class="stit">GitHub Milestones</h2></div>
+  <table>
+    <thead><tr><th>Milestone</th><th>Issues</th><th>Definition of Done</th></tr></thead>
+    <tbody>
+      <tr><td>v0.1-foundation</td><td>#1-#10</td><td>Docker up, /health returns 200, alembic migration runs, React renders</td></tr>
+      <tr><td>v0.2-analysis</td><td>#11-#30</td><td>OHLCV stored from MT5, EMA/MACD/Fibonacci computing, SMC zones detected, unit tests 80%+</td></tr>
+      <tr><td>v0.3-autotrading</td><td>#31-#60</td><td>YAML strategy evaluating, trades executing on demo MT5, risk cap enforced, TradingView webhook working</td></tr>
+      <tr><td>v1.0-dashboard</td><td>#61-#80</td><td>Chart renders with overlays, live positions update, Claude chat responding, all integration tests pass</td></tr>
+    </tbody>
+  </table>
+
+  <h3>GitHub Labels</h3>
+  <table>
+    <thead><tr><th>Label</th><th>Color</th><th>Usage</th></tr></thead>
+    <tbody>
+      <tr><td>feature</td><td>Blue #3b82f6</td><td>New functionality</td></tr>
+      <tr><td>bug</td><td>Red #ef4444</td><td>Something broken</td></tr>
+      <tr><td>infra</td><td>Green #10b981</td><td>Docker, CI, tooling</td></tr>
+      <tr><td>analysis</td><td>Purple #8b5cf6</td><td>Indicator / SMC work</td></tr>
+      <tr><td>strategy</td><td>Orange #f97316</td><td>Strategy engine, YAML</td></tr>
+      <tr><td>execution</td><td>Red-orange #ef4444</td><td>MT5 execution engine</td></tr>
+      <tr><td>ui</td><td>Teal #06b6d4</td><td>React frontend</td></tr>
+      <tr><td>ai</td><td>Pink #ec4899</td><td>Claude co-pilot</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sh" id="s3"><span class="snum s3">3</span><h2 class="stit">Phase 1 — Analysis Engine Issues</h2></div>
+
+  <div class="epic">
+    <div class="epic-header"><div class="epic-title">Epic: MT5 Data Feed + OHLCV Storage</div><span class="epic-badge e1">Phase 1</span></div>
+    <div class="issue-list">
+      <div class="issue"><span class="issue-label infra">#11 infra</span><span class="issue-text">MT5Client: connect/disconnect + health check</span><span class="issue-pts">3pts</span></div>
+      <div class="issue"><span class="issue-label feat">#12 feature</span><span class="issue-text">MT5 price feed ingestion service (candle close detection)</span><span class="issue-pts">5pts</span></div>
+      <div class="issue"><span class="issue-label feat">#13 feature</span><span class="issue-text">OHLCV store: write candles to TimescaleDB</span><span class="issue-pts">3pts</span></div>
+      <div class="issue"><span class="issue-label feat">#14 feature</span><span class="issue-text">Historical backfill: load N candles on startup</span><span class="issue-pts">3pts</span></div>
+      <div class="issue"><span class="issue-label feat">#15 feature</span><span class="issue-text">Redis pub/sub: publish candle.close events</span><span class="issue-pts">2pts</span></div>
+    </div>
+  </div>
+
+  <div class="epic">
+    <div class="epic-header"><div class="epic-title">Epic: Technical Indicators</div><span class="epic-badge e1">Phase 1</span></div>
+    <div class="issue-list">
+      <div class="issue"><span class="issue-label feat">#16 feature</span><span class="issue-text">EMA computation (20/50/200) + cross detection</span><span class="issue-pts">2pts</span></div>
+      <div class="issue"><span class="issue-label feat">#17 feature</span><span class="issue-text">MACD (12,26,9) + signal state detection</span><span class="issue-pts">2pts</span></div>
+      <div class="issue"><span class="issue-label feat">#18 feature</span><span class="issue-text">Fibonacci Retracement levels from swing high/low</span><span class="issue-pts">3pts</span></div>
+      <div class="issue"><span class="issue-label feat">#19 feature</span><span class="issue-text">Fibonacci Time Zones</span><span class="issue-pts">2pts</span></div>
+      <div class="issue"><span class="issue-label feat">#20 feature</span><span class="issue-text">Volume Profile (VPVR) — POC/VAH/VAL</span><span class="issue-pts">5pts</span></div>
+      <div class="issue"><span class="issue-label feat">#21 feature</span><span class="issue-text">Candlestick pattern detection (TA-Lib)</span><span class="issue-pts">3pts</span></div>
+    </div>
+  </div>
+
+  <div class="epic">
+    <div class="epic-header"><div class="epic-title">Epic: SMC (Smart Money Concepts)</div><span class="epic-badge e1">Phase 1</span></div>
+    <div class="issue-list">
+      <div class="issue"><span class="issue-label feat">#22 feature</span><span class="issue-text">BOS/ChoCH detection + market structure state machine</span><span class="issue-pts">5pts</span></div>
+      <div class="issue"><span class="issue-label feat">#23 feature</span><span class="issue-text">Order Block detection (bullish + bearish)</span><span class="issue-pts">5pts</span></div>
+      <div class="issue"><span class="issue-label feat">#24 feature</span><span class="issue-text">Fair Value Gap (FVG) detection + fill tracking</span><span class="issue-pts">3pts</span></div>
+      <div class="issue"><span class="issue-label feat">#25 feature</span><span class="issue-text">Liquidity sweep detection (SSL/BSL)</span><span class="issue-pts">3pts</span></div>
+      <div class="issue"><span class="issue-label feat">#26 feature</span><span class="issue-text">Demand/Supply zone identification</span><span class="issue-pts">3pts</span></div>
+      <div class="issue"><span class="issue-label feat">#27 feature</span><span class="issue-text">Wick fill opportunity detection</span><span class="issue-pts">2pts</span></div>
+      <div class="issue"><span class="issue-label feat">#28 feature</span><span class="issue-text">Stop Loss sweep pattern detection</span><span class="issue-pts">2pts</span></div>
+      <div class="issue"><span class="issue-label feat">#29 feature</span><span class="issue-text">GET /indicators/{symbol}/{timeframe} API endpoint</span><span class="issue-pts">2pts</span></div>
+      <div class="issue"><span class="issue-label feat">#30 feature</span><span class="issue-text">GET /smc/{symbol}/{timeframe} API endpoint</span><span class="issue-pts">2pts</span></div>
+    </div>
+  </div>
+
+  <div class="sh" id="s4"><span class="snum s4">4</span><h2 class="stit">Phase 2 — Strategy + Execution Issues</h2></div>
+
+  <div class="epic">
+    <div class="epic-header"><div class="epic-title">Epic: Strategy Engine</div><span class="epic-badge e2">Phase 2</span></div>
+    <div class="issue-list">
+      <div class="issue"><span class="issue-label feat">#31 feature</span><span class="issue-text">YAML strategy config loader + validator</span><span class="issue-pts">3pts</span></div>
+      <div class="issue"><span class="issue-label feat">#32 feature</span><span class="issue-text">Strategy condition evaluator (AND/OR logic)</span><span class="issue-pts">5pts</span></div>
+      <div class="issue"><span class="issue-label feat">#33 feature</span><span class="issue-text">Money manager: Fixed Lot, Fixed Fractional, Kelly</span><span class="issue-pts">3pts</span></div>
+      <div class="issue"><span class="issue-label feat">#34 feature</span><span class="issue-text">Risk manager: daily cap, max positions, drawdown</span><span class="issue-pts">5pts</span></div>
+      <div class="issue"><span class="issue-label feat">#35 feature</span><span class="issue-text">TradingView webhook endpoint + HMAC verification</span><span class="issue-pts">3pts</span></div>
+    </div>
+  </div>
+
+  <div class="epic">
+    <div class="epic-header"><div class="epic-title">Epic: MT5 Auto-Execution</div><span class="epic-badge e2">Phase 2</span></div>
+    <div class="issue-list">
+      <div class="issue"><span class="issue-label feat">#36 feature</span><span class="issue-text">Order Manager: intent → DB write → MT5 execute</span><span class="issue-pts">5pts</span></div>
+      <div class="issue"><span class="issue-label feat">#37 feature</span><span class="issue-text">Position Manager: sync MT5 open positions to DB</span><span class="issue-pts">3pts</span></div>
+      <div class="issue"><span class="issue-label feat">#38 feature</span><span class="issue-text">Trailing stop management</span><span class="issue-pts">3pts</span></div>
+      <div class="issue"><span class="issue-label feat">#39 feature</span><span class="issue-text">MT5 circuit breaker (disconnect → halt)</span><span class="issue-pts">3pts</span></div>
+      <div class="issue"><span class="issue-label feat">#40 feature</span><span class="issue-text">Grid trading strategy execution</span><span class="issue-pts">8pts</span></div>
+      <div class="issue"><span class="issue-label feat">#41 feature</span><span class="issue-text">Martingale controller (with mandatory max cap)</span><span class="issue-pts">5pts</span></div>
+      <div class="issue"><span class="issue-label feat">#42 feature</span><span class="issue-text">Hedging: open opposing position on trigger</span><span class="issue-pts">3pts</span></div>
+      <div class="issue"><span class="issue-label feat">#43 feature</span><span class="issue-text">News trading: economic calendar pause/trigger</span><span class="issue-pts">5pts</span></div>
+    </div>
+  </div>
+
+  <div class="sh" id="s5"><span class="snum s5">5</span><h2 class="stit">Phase 3 — Dashboard + AI Issues</h2></div>
+
+  <div class="epic">
+    <div class="epic-header"><div class="epic-title">Epic: React Dashboard</div><span class="epic-badge e3">Phase 3</span></div>
+    <div class="issue-list">
+      <div class="issue"><span class="issue-label feat">#61 feature</span><span class="issue-text">TradingView Lightweight Charts candlestick component</span><span class="issue-pts">5pts</span></div>
+      <div class="issue"><span class="issue-label feat">#62 feature</span><span class="issue-text">EMA + MACD indicator overlays on chart</span><span class="issue-pts">3pts</span></div>
+      <div class="issue"><span class="issue-label feat">#63 feature</span><span class="issue-text">Fibonacci level overlays on chart</span><span class="issue-pts">3pts</span></div>
+      <div class="issue"><span class="issue-label feat">#64 feature</span><span class="issue-text">SMC zone overlays (OB, FVG, BOS markers)</span><span class="issue-pts">5pts</span></div>
+      <div class="issue"><span class="issue-label feat">#65 feature</span><span class="issue-text">Live positions panel with WebSocket P&L update</span><span class="issue-pts">5pts</span></div>
+      <div class="issue"><span class="issue-label feat">#66 feature</span><span class="issue-text">Trade history table with filter/sort/export</span><span class="issue-pts">3pts</span></div>
+      <div class="issue"><span class="issue-label feat">#67 feature</span><span class="issue-text">Performance analytics: equity curve, win rate, drawdown</span><span class="issue-pts">5pts</span></div>
+      <div class="issue"><span class="issue-label feat">#68 feature</span><span class="issue-text">Strategy control panel (activate/pause per strategy)</span><span class="issue-pts">3pts</span></div>
+    </div>
+  </div>
+
+  <div class="epic">
+    <div class="epic-header"><div class="epic-title">Epic: Claude AI Co-Pilot</div><span class="epic-badge e3">Phase 3</span></div>
+    <div class="issue-list">
+      <div class="issue"><span class="issue-label feat">#69 feature</span><span class="issue-text">Claude co-pilot backend service (streaming response)</span><span class="issue-pts">5pts</span></div>
+      <div class="issue"><span class="issue-label feat">#70 feature</span><span class="issue-text">Co-pilot chat UI with markdown rendering</span><span class="issue-pts">3pts</span></div>
+      <div class="issue"><span class="issue-label feat">#71 feature</span><span class="issue-text">Inject indicator snapshot context into co-pilot prompt</span><span class="issue-pts">3pts</span></div>
+      <div class="issue"><span class="issue-label feat">#72 feature</span><span class="issue-text">Daily market report generation (cron-scheduled)</span><span class="issue-pts">3pts</span></div>
+    </div>
+  </div>
+
+  <div class="sh" id="s6"><span class="snum s6">6</span><h2 class="stit">Definition of Done</h2></div>
+  <table>
+    <thead><tr><th>Phase</th><th>Done When</th></tr></thead>
+    <tbody>
+      <tr><td>Phase 1 complete</td><td>MT5 feed ingesting live OHLCV → stored in TimescaleDB. All indicator unit tests pass (80%+ coverage). SMC zones returned by API.</td></tr>
+      <tr><td>Phase 2 complete</td><td>Strategy evaluated on candle close → order placed on MT5 demo account. TradingView webhook triggers trade. Risk cap blocks order when daily limit hit. Grid/Martingale running on demo.</td></tr>
+      <tr><td>Phase 3 complete</td><td>Dashboard loads in &lt;3s. Live positions update via WebSocket. Chart renders with all overlays. Claude co-pilot answers market questions. All integration tests pass.</td></tr>
+      <tr><td>Gate 5 (ship)</td><td>All tests green, coverage targets met, security checklist verified, CI pipeline passing, README updated.</td></tr>
+    </tbody>
+  </table>
+
+</main>
+<script>
+function toggleTheme(){var h=document.documentElement,d=h.getAttribute('data-theme')==='dark';if(d){h.removeAttribute('data-theme');localStorage.setItem('docportal-theme','light');document.getElementById('ti').innerHTML='&#9788;';}else{h.setAttribute('data-theme','dark');localStorage.setItem('docportal-theme','dark');document.getElementById('ti').innerHTML='&#9790;';}}
+(function(){var s=localStorage.getItem('docportal-theme');if(s==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('ti').innerHTML='&#9790;';}})();
+var secs=document.querySelectorAll('.sh[id]'),links=document.querySelectorAll('.toc a'),c=document.querySelector('.content');
+c.addEventListener('scroll',function(){var cur='';secs.forEach(function(s){if(c.scrollTop>=s.offsetTop-c.offsetTop-100)cur=s.id;});links.forEach(function(l){l.classList.remove('active');if(l.getAttribute('href')==='#'+cur)l.classList.add('active');});});
+links.forEach(function(l){l.addEventListener('click',function(e){e.preventDefault();var t=document.querySelector(l.getAttribute('href'));if(t)c.scrollTo({top:t.offsetTop-c.offsetTop-20,behavior:'smooth'});});});
+</script>
+</body>
+</html>

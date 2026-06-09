@@ -1,14 +1,40 @@
 {
   "workflow": "dev-starter",
   "status": "in_progress",
-  "gate": 0,
+  "gate": 2,
   "autopilot_mode": false,
-  "current_task": "Gate 0 — Project Setup",
-  "completed_tasks": [],
-  "next_task": "Gate 1 — Discovery documents",
-  "files_modified": ["devstarter-config.yml", "memory/progress.json"],
-  "tasks_this_session": 1,
-  "files_read_this_session": 8,
-  "last_checkpoint": "2026-06-09T00:00:00",
+  "current_task": "Gate 2 — Architecture COMPLETE — awaiting approval",
+  "completed_gates": [0, 1, 2],
+  "deliverables": {
+    "gate_0": ["devstarter-config.yml", ".gitignore", ".env.example", "git init + initial commit"],
+    "gate_1": ["CLAUDE.md", "docs/brd.html", "docs/srs.html"],
+    "gate_2": [
+      "docs/index.html",
+      "docs/database-design.html",
+      "docs/api-reference.html",
+      "docs/security-design.html",
+      "docs/infrastructure-guide.html",
+      "docs/test-strategy.html",
+      "docs/project-plan.html",
+      "docs/prototype/index.html"
+    ]
+  },
+  "next_gate": {
+    "gate": 3,
+    "name": "Foundation",
+    "deliverables": [
+      "docker-compose.yml (TimescaleDB + Redis with healthchecks)",
+      "backend/ scaffold — FastAPI app, /health endpoint, folder structure",
+      "frontend/ scaffold — Vite + React + TypeScript, Zustand, React Query",
+      "GitHub Issues + milestones created (Phase 1 epics)"
+    ]
+  },
+  "project": {
+    "name": "AITrading",
+    "repo": "https://github.com/clickzika/AITrading.git",
+    "stack": ["python", "react", "postgresql", "redis"],
+    "symbols": ["XAUUSD", "EURUSD", "GBPUSD", "BTCUSD", "ETHUSD"]
+  },
+  "last_checkpoint": "2026-06-09",
   "notes": "Greenfield project. GitHub: clickzika/AITrading. VCS: GitHub. PM: GitHub Issues. Stack: Python + FastAPI + Redis + TimescaleDB + React."
 }

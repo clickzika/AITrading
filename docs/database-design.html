@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Database Design — AITrading</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--bg-page:#f5f7fa;--bg-header:#fff;--bg-sidebar:#f0f2f5;--bg-content:#fff;--bg-card:#f8f9fb;--bg-hover:#e8ebf0;--accent:#e94560;--accent-light:#d63851;--text:#1a1a2e;--text-dim:#5a6578;--text-muted:#8493a8;--border:#d8dde4;--border-light:#e2e7ed;--s1:#3b82f6;--s2:#8b5cf6;--s3:#f59e0b;--s4:#10b981;--s5:#ef4444;--s6:#f97316;--s7:#06b6d4;--s8:#ec4899;--s9:#6366f1;--s10:#14b8a6;--header-h:64px;--sidebar-w:280px;--code-bg:#f1f5f9;--code-color:#d63851;--table-even:rgba(0,0,0,.02);--shadow:0 1px 3px rgba(0,0,0,.06);--toggle-bg:#e2e6eb;--toggle-knob:#fff}
+  [data-theme=dark]{--bg-page:#0f0f23;--bg-header:#1a1a2e;--bg-sidebar:#16213e;--bg-content:#1e1e3a;--bg-card:#252547;--bg-hover:#0f3460;--text:#eee;--text-dim:#94a3b8;--text-muted:#64748b;--border:#1e3a5f;--border-light:#2d4a6f;--code-bg:#0d0d1a;--code-color:#ff6b81;--table-even:rgba(255,255,255,.02);--shadow:0 1px 3px rgba(0,0,0,.3);--toggle-bg:#1e3a5f;--toggle-knob:#e94560}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-page);color:var(--text);line-height:1.6;height:100vh;overflow:hidden}
+  .doc-header{position:fixed;top:0;left:0;right:0;height:var(--header-h);background:var(--bg-header);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 32px;z-index:100;box-shadow:var(--shadow)}
+  .dhl{display:flex;align-items:center;gap:16px}
+  .logo{width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff}
+  .dht{display:flex;flex-direction:column}
+  .dht-p{font-size:18px;font-weight:700;letter-spacing:-.3px}
+  .dht-d{font-size:12px;color:var(--text-dim)}
+  .dhr{display:flex;align-items:center;gap:12px}
+  .meta{text-align:right;font-size:12px;color:var(--text-dim)}
+  .sbadge{display:inline-flex;align-items:center;gap:6px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600;text-transform:uppercase;background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)}
+  .tgl{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+  .tgl-t{width:44px;height:24px;background:var(--toggle-bg);border-radius:12px;position:relative;border:1px solid var(--border)}
+  .tgl-k{width:18px;height:18px;background:var(--toggle-knob);border-radius:50%;position:absolute;top:2px;left:3px;transition:transform .3s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+  [data-theme=dark] .tgl-k{transform:translateX(20px)}
+  .sidebar{position:fixed;top:var(--header-h);left:0;bottom:0;width:var(--sidebar-w);background:var(--bg-sidebar);border-right:1px solid var(--border);overflow-y:auto;padding:20px 0;z-index:50}
+  .sidebar::-webkit-scrollbar{width:4px}.sidebar::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:4px}
+  .stitle{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);padding:0 20px 12px;border-bottom:1px solid var(--border);margin-bottom:8px}
+  .toc{list-style:none}.toc a{display:flex;align-items:center;gap:10px;padding:8px 20px;color:var(--text-dim);text-decoration:none;font-size:13px;font-weight:500;transition:all .15s;border-left:3px solid transparent}
+  .toc a:hover,.toc a.active{background:var(--bg-hover);color:var(--text);border-left-color:var(--accent)}
+  .toc a.active{background:rgba(233,69,96,.1);color:var(--accent-light)}
+  .tnum{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;font-size:11px;font-weight:700;flex-shrink:0;color:#fff}
+  .s1{background:var(--s1)}.s2{background:var(--s2)}.s3{background:var(--s3)}.s4{background:var(--s4)}.s5{background:var(--s5)}.s6{background:var(--s6)}.s7{background:var(--s7)}.s8{background:var(--s8)}
+  .infocard{margin:16px 12px 0;padding:14px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;font-size:12px}
+  .irow{display:flex;justify-content:space-between;padding:4px 0;color:var(--text-dim)}.irow span:first-child{color:var(--text-muted)}
+  .content{margin-left:var(--sidebar-w);margin-top:var(--header-h);height:calc(100vh - var(--header-h));overflow-y:auto;padding:40px 48px 80px;background:var(--bg-content)}
+  .content::-webkit-scrollbar{width:6px}.content::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:6px}
+  .sh{display:flex;align-items:center;gap:14px;margin:48px 0 20px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+  .sh:first-child{margin-top:0}
+  .snum{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;font-size:14px;font-weight:800;color:#fff;flex-shrink:0}
+  .stit{font-size:22px;font-weight:700;letter-spacing:-.3px}
+  h3{font-size:16px;font-weight:600;color:var(--text);margin:28px 0 12px;border-left:3px solid var(--accent);padding-left:12px}
+  h4{font-size:14px;font-weight:600;color:var(--text-dim);margin:20px 0 8px}
+  p{color:var(--text-dim);margin-bottom:16px;font-size:14px;line-height:1.7}
+  table{width:100%;border-collapse:collapse;margin:16px 0 24px;font-size:13px;border-radius:8px;overflow:hidden;border:1px solid var(--border)}
+  thead th{background:var(--bg-sidebar);color:var(--text);font-weight:600;text-align:left;padding:12px 16px;font-size:12px;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--accent)}
+  tbody tr{border-bottom:1px solid var(--border)}
+  tbody tr:nth-child(even){background:var(--table-even)}
+  tbody tr:hover{background:rgba(233,69,96,.04)}
+  td{padding:10px 16px;color:var(--text-dim);vertical-align:top}
+  pre{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:16px 20px;overflow-x:auto;margin:12px 0 20px;font-size:13px;line-height:1.5}
+  code{font-family:'JetBrains Mono','Consolas',monospace;font-size:13px}
+  :not(pre)>code{background:rgba(233,69,96,.08);color:var(--code-color);padding:2px 6px;border-radius:4px;font-size:12px}
+  ul,ol{margin:8px 0 16px 24px;color:var(--text-dim);font-size:14px}
+  li{margin-bottom:6px;line-height:1.6}
+  .card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin:16px 0 24px}
+  .note{border-left:4px solid var(--s1);background:rgba(59,130,246,.05)}
+  .warn{border-left:4px solid #f59e0b;background:rgba(245,158,11,.05)}
+  .crit{border-left:4px solid var(--s5);background:rgba(239,68,68,.05)}
+  .badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:600;text-transform:uppercase}
+  .b-pk{background:rgba(239,68,68,.15);color:#ef4444}
+  .b-fk{background:rgba(59,130,246,.15);color:#3b82f6}
+  .b-idx{background:rgba(16,185,129,.15);color:#10b981}
+  .b-nn{background:rgba(245,158,11,.15);color:#f59e0b}
+  @media print{.doc-header{position:static}.sidebar{display:none}.content{margin-left:0;height:auto;overflow:visible;padding:20px}body{background:#fff;color:#000;overflow:auto}.tgl{display:none}}
+</style>
+</head>
+<body>
+<header class="doc-header">
+  <div class="dhl">
+    <div class="logo">AT</div>
+    <div class="dht"><div class="dht-p">AITrading</div><div class="dht-d">Database Design</div></div>
+  </div>
+  <div class="dhr">
+    <div class="meta"><div>Version 1.0 · 2026-06-09</div><div>Gate 2 — Architecture</div></div>
+    <span class="sbadge">● Draft</span>
+    <div class="tgl" onclick="toggleTheme()"><span id="ti">☀</span><div class="tgl-t"><div class="tgl-k"></div></div></div>
+  </div>
+</header>
+<nav class="sidebar">
+  <div class="stitle">Table of Contents</div>
+  <ul class="toc">
+    <li><a href="#s1" class="active"><span class="tnum s1">1</span> Overview</a></li>
+    <li><a href="#s2"><span class="tnum s2">2</span> TimescaleDB Setup</a></li>
+    <li><a href="#s3"><span class="tnum s3">3</span> Table Schemas</a></li>
+    <li><a href="#s4"><span class="tnum s4">4</span> Indexes</a></li>
+    <li><a href="#s5"><span class="tnum s5">5</span> SQLAlchemy Models</a></li>
+    <li><a href="#s6"><span class="tnum s6">6</span> Alembic Migrations</a></li>
+    <li><a href="#s7"><span class="tnum s7">7</span> Query Patterns</a></li>
+    <li><a href="#s8"><span class="tnum s8">8</span> Data Retention</a></li>
+  </ul>
+  <div class="infocard">
+    <div class="irow"><span>Version</span><span>1.0</span></div>
+    <div class="irow"><span>DB</span><span>TimescaleDB 2.x</span></div>
+    <div class="irow"><span>PG</span><span>PostgreSQL 15</span></div>
+    <div class="irow"><span>ORM</span><span>SQLAlchemy 2.0</span></div>
+  </div>
+</nav>
+<main class="content">
+
+  <div class="sh" id="s1"><span class="snum s1">1</span><h2 class="stit">Overview</h2></div>
+  <p>AITrading uses TimescaleDB (PostgreSQL extension) for all persistent storage. TimescaleDB provides automatic partitioning of time-series data into chunks, significantly improving query performance on OHLCV candle history. Async access via SQLAlchemy 2.0 with asyncpg driver.</p>
+  <table>
+    <thead><tr><th>Table</th><th>Type</th><th>Purpose</th><th>Est. Size</th></tr></thead>
+    <tbody>
+      <tr><td><code>ohlcv_candles</code></td><td>Hypertable</td><td>OHLCV candle data per symbol/timeframe</td><td>~50M rows/year</td></tr>
+      <tr><td><code>trades</code></td><td>Regular</td><td>All order intents + executed trades</td><td>&lt;10K rows/year</td></tr>
+      <tr><td><code>positions</code></td><td>Regular</td><td>Current open positions (synced from MT5)</td><td>&lt;100 rows</td></tr>
+      <tr><td><code>risk_state</code></td><td>Regular</td><td>Daily risk tracking (loss cap, halt flag)</td><td>365 rows/year</td></tr>
+      <tr><td><code>signals</code></td><td>Regular</td><td>All strategy signal events (fired + rejected)</td><td>&lt;50K rows/year</td></tr>
+      <tr><td><code>smc_zones</code></td><td>Regular</td><td>Active SMC zones per symbol/timeframe</td><td>&lt;1K rows</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sh" id="s2"><span class="snum s2">2</span><h2 class="stit">TimescaleDB Setup</h2></div>
+  <h3>Docker Compose Database Service</h3>
+  <pre><code>timescaledb:
+  image: timescale/timescaledb:latest-pg15
+  environment:
+    POSTGRES_DB: aitrading
+    POSTGRES_USER: aitrading
+    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  ports:
+    - "5432:5432"
+  volumes:
+    - timescaledb_data:/var/lib/postgresql/data
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U aitrading"]
+    interval: 5s
+    timeout: 5s
+    retries: 5</code></pre>
+
+  <h3>Enable TimescaleDB Extension</h3>
+  <pre><code>-- Run once after DB creation (handled by Alembic initial migration)
+CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE;</code></pre>
+
+  <h3>Connection String</h3>
+  <pre><code>DATABASE_URL=postgresql+asyncpg://aitrading:password@localhost:5432/aitrading</code></pre>
+
+  <div class="sh" id="s3"><span class="snum s3">3</span><h2 class="stit">Table Schemas</h2></div>
+
+  <h3>ohlcv_candles — Hypertable</h3>
+  <pre><code>CREATE TABLE ohlcv_candles (
+    time        TIMESTAMPTZ     NOT NULL,
+    symbol      VARCHAR(20)     NOT NULL,
+    timeframe   VARCHAR(5)      NOT NULL,   -- M1,M5,M15,M30,H1,H4,D1,W1
+    open        NUMERIC(20, 8)  NOT NULL,
+    high        NUMERIC(20, 8)  NOT NULL,
+    low         NUMERIC(20, 8)  NOT NULL,
+    close       NUMERIC(20, 8)  NOT NULL,
+    volume      NUMERIC(20, 8)  NOT NULL DEFAULT 0,
+    PRIMARY KEY (time, symbol, timeframe)
+);
+
+-- Convert to hypertable, partition by 1 day
+SELECT create_hypertable(
+    'ohlcv_candles',
+    'time',
+    chunk_time_interval => INTERVAL '1 day',
+    if_not_exists => TRUE
+);</code></pre>
+
+  <table>
+    <thead><tr><th>Column</th><th>Type</th><th>Constraint</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>time</td><td>TIMESTAMPTZ</td><td><span class="badge b-pk">PK</span> <span class="badge b-nn">NOT NULL</span></td><td>Candle open time (UTC). TimescaleDB partition key.</td></tr>
+      <tr><td>symbol</td><td>VARCHAR(20)</td><td><span class="badge b-pk">PK</span> <span class="badge b-nn">NOT NULL</span></td><td>e.g. XAUUSD, EURUSD, BTCUSD</td></tr>
+      <tr><td>timeframe</td><td>VARCHAR(5)</td><td><span class="badge b-pk">PK</span> <span class="badge b-nn">NOT NULL</span></td><td>M1, M5, M15, H1, H4, D1</td></tr>
+      <tr><td>open/high/low/close</td><td>NUMERIC(20,8)</td><td><span class="badge b-nn">NOT NULL</span></td><td>8 decimal places for crypto precision</td></tr>
+      <tr><td>volume</td><td>NUMERIC(20,8)</td><td>DEFAULT 0</td><td>MT5 tick volume</td></tr>
+    </tbody>
+  </table>
+
+  <h3>trades</h3>
+  <pre><code>CREATE TABLE trades (
+    id              UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
+    mt5_ticket      BIGINT          UNIQUE,           -- NULL until MT5 fills
+    symbol          VARCHAR(20)     NOT NULL,
+    strategy_id     VARCHAR(100)    NOT NULL,
+    direction       VARCHAR(4)      NOT NULL CHECK (direction IN ('BUY','SELL')),
+    lot_size        NUMERIC(10, 4)  NOT NULL,
+    entry_price     NUMERIC(20, 8),                   -- NULL = market order
+    sl_price        NUMERIC(20, 8)  NOT NULL,
+    tp_price        NUMERIC(20, 8)  NOT NULL,
+    exit_price      NUMERIC(20, 8),
+    pnl_usd         NUMERIC(12, 2),
+    status          VARCHAR(20)     NOT NULL DEFAULT 'PENDING'
+                        CHECK (status IN ('PENDING','OPEN','CLOSED','CANCELLED','ERROR')),
+    entry_reason    JSONB,                            -- indicator snapshot at entry
+    error_message   TEXT,
+    opened_at       TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+    closed_at       TIMESTAMPTZ,
+    created_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);</code></pre>
+
+  <h3>positions</h3>
+  <pre><code>CREATE TABLE positions (
+    ticket          BIGINT          PRIMARY KEY,      -- MT5 ticket
+    symbol          VARCHAR(20)     NOT NULL,
+    strategy_id     VARCHAR(100),
+    direction       VARCHAR(4)      NOT NULL,
+    lot_size        NUMERIC(10, 4)  NOT NULL,
+    open_price      NUMERIC(20, 8)  NOT NULL,
+    current_price   NUMERIC(20, 8),
+    sl_price        NUMERIC(20, 8),
+    tp_price        NUMERIC(20, 8),
+    floating_pnl    NUMERIC(12, 2),
+    opened_at       TIMESTAMPTZ     NOT NULL,
+    synced_at       TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);</code></pre>
+
+  <h3>risk_state</h3>
+  <pre><code>CREATE TABLE risk_state (
+    date                DATE        PRIMARY KEY,
+    realized_pnl_usd    NUMERIC(12, 2)  NOT NULL DEFAULT 0,
+    unrealized_pnl_usd  NUMERIC(12, 2)  NOT NULL DEFAULT 0,
+    trade_count         INTEGER         NOT NULL DEFAULT 0,
+    trading_halted      BOOLEAN         NOT NULL DEFAULT FALSE,
+    halt_reason         VARCHAR(100),
+    peak_equity         NUMERIC(12, 2),             -- for drawdown calc
+    updated_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);</code></pre>
+
+  <h3>signals</h3>
+  <pre><code>CREATE TABLE signals (
+    id              UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
+    strategy_id     VARCHAR(100)    NOT NULL,
+    symbol          VARCHAR(20)     NOT NULL,
+    timeframe       VARCHAR(5)      NOT NULL,
+    direction       VARCHAR(4)      NOT NULL,
+    status          VARCHAR(20)     NOT NULL  -- FIRED | REJECTED | EXECUTED
+                        CHECK (status IN ('FIRED','REJECTED','EXECUTED')),
+    reject_reason   VARCHAR(200),
+    trade_id        UUID            REFERENCES trades(id),
+    indicator_snap  JSONB,                    -- full IndicatorSnapshot at signal time
+    fired_at        TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);</code></pre>
+
+  <h3>smc_zones</h3>
+  <pre><code>CREATE TABLE smc_zones (
+    id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    symbol      VARCHAR(20) NOT NULL,
+    timeframe   VARCHAR(5)  NOT NULL,
+    zone_type   VARCHAR(20) NOT NULL  -- ORDER_BLOCK | FVG | DEMAND | SUPPLY | BOS | CHOCH
+                    CHECK (zone_type IN ('ORDER_BLOCK','FVG','DEMAND','SUPPLY','BOS','CHOCH')),
+    direction   VARCHAR(10) NOT NULL  -- BULLISH | BEARISH
+                    CHECK (direction IN ('BULLISH','BEARISH')),
+    price_high  NUMERIC(20, 8) NOT NULL,
+    price_low   NUMERIC(20, 8) NOT NULL,
+    is_valid    BOOLEAN     NOT NULL DEFAULT TRUE,
+    formed_at   TIMESTAMPTZ NOT NULL,
+    invalidated_at  TIMESTAMPTZ,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);</code></pre>
+
+  <div class="sh" id="s4"><span class="snum s4">4</span><h2 class="stit">Indexes</h2></div>
+  <pre><code>-- ohlcv_candles: time-series queries
+CREATE INDEX idx_ohlcv_symbol_tf_time ON ohlcv_candles (symbol, timeframe, time DESC);
+-- TimescaleDB adds partition-aware index automatically on PRIMARY KEY
+
+-- trades: dashboard queries
+CREATE INDEX idx_trades_symbol ON trades (symbol);
+CREATE INDEX idx_trades_strategy ON trades (strategy_id);
+CREATE INDEX idx_trades_status ON trades (status);
+CREATE INDEX idx_trades_opened_at ON trades (opened_at DESC);
+
+-- signals: analytics
+CREATE INDEX idx_signals_strategy ON signals (strategy_id, fired_at DESC);
+CREATE INDEX idx_signals_symbol ON signals (symbol, fired_at DESC);
+
+-- smc_zones: active zone lookup
+CREATE INDEX idx_smc_symbol_tf_valid ON smc_zones (symbol, timeframe, is_valid)
+    WHERE is_valid = TRUE;</code></pre>
+
+  <div class="sh" id="s5"><span class="snum s5">5</span><h2 class="stit">SQLAlchemy Models</h2></div>
+  <pre><code>from __future__ import annotations
+from datetime import datetime
+from decimal import Decimal
+from uuid import UUID, uuid4
+import enum
+from sqlalchemy import String, Numeric, Boolean, Text, ForeignKey
+from sqlalchemy import TIMESTAMP, Integer, BigInteger, Date, CheckConstraint
+from sqlalchemy.dialects.postgresql import UUID as PGUUID, JSONB
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+
+class Base(DeclarativeBase):
+    pass
+
+class TradeStatus(str, enum.Enum):
+    PENDING   = "PENDING"
+    OPEN      = "OPEN"
+    CLOSED    = "CLOSED"
+    CANCELLED = "CANCELLED"
+    ERROR     = "ERROR"
+
+class OHLCVCandle(Base):
+    __tablename__ = "ohlcv_candles"
+    time:       Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), primary_key=True)
+    symbol:     Mapped[str]      = mapped_column(String(20), primary_key=True)
+    timeframe:  Mapped[str]      = mapped_column(String(5),  primary_key=True)
+    open:       Mapped[Decimal]  = mapped_column(Numeric(20, 8))
+    high:       Mapped[Decimal]  = mapped_column(Numeric(20, 8))
+    low:        Mapped[Decimal]  = mapped_column(Numeric(20, 8))
+    close:      Mapped[Decimal]  = mapped_column(Numeric(20, 8))
+    volume:     Mapped[Decimal]  = mapped_column(Numeric(20, 8), default=0)
+
+class Trade(Base):
+    __tablename__ = "trades"
+    id:             Mapped[UUID]         = mapped_column(PGUUID, primary_key=True, default=uuid4)
+    mt5_ticket:     Mapped[int | None]   = mapped_column(BigInteger, unique=True)
+    symbol:         Mapped[str]          = mapped_column(String(20), nullable=False)
+    strategy_id:    Mapped[str]          = mapped_column(String(100), nullable=False)
+    direction:      Mapped[str]          = mapped_column(String(4), nullable=False)
+    lot_size:       Mapped[Decimal]      = mapped_column(Numeric(10, 4), nullable=False)
+    entry_price:    Mapped[Decimal|None] = mapped_column(Numeric(20, 8))
+    sl_price:       Mapped[Decimal]      = mapped_column(Numeric(20, 8), nullable=False)
+    tp_price:       Mapped[Decimal]      = mapped_column(Numeric(20, 8), nullable=False)
+    exit_price:     Mapped[Decimal|None] = mapped_column(Numeric(20, 8))
+    pnl_usd:        Mapped[Decimal|None] = mapped_column(Numeric(12, 2))
+    status:         Mapped[str]          = mapped_column(String(20), default="PENDING")
+    entry_reason:   Mapped[dict|None]    = mapped_column(JSONB)
+    error_message:  Mapped[str|None]     = mapped_column(Text)
+    opened_at:      Mapped[datetime]     = mapped_column(TIMESTAMP(timezone=True))
+    closed_at:      Mapped[datetime|None]= mapped_column(TIMESTAMP(timezone=True))
+    created_at:     Mapped[datetime]     = mapped_column(TIMESTAMP(timezone=True))
+
+class RiskState(Base):
+    __tablename__ = "risk_state"
+    date:               Mapped[datetime]     = mapped_column(Date, primary_key=True)
+    realized_pnl_usd:   Mapped[Decimal]      = mapped_column(Numeric(12, 2), default=0)
+    trading_halted:     Mapped[bool]         = mapped_column(Boolean, default=False)
+    halt_reason:        Mapped[str|None]     = mapped_column(String(100))
+    peak_equity:        Mapped[Decimal|None] = mapped_column(Numeric(12, 2))
+    updated_at:         Mapped[datetime]     = mapped_column(TIMESTAMP(timezone=True))</code></pre>
+
+  <div class="sh" id="s6"><span class="snum s6">6</span><h2 class="stit">Alembic Migrations</h2></div>
+  <h3>Structure</h3>
+  <pre><code>backend/alembic/
+├── env.py             ← async engine config
+├── versions/
+│   ├── 001_initial.py ← CREATE EXTENSION + all tables
+│   ├── 002_hypertable.py ← create_hypertable calls
+│   └── 003_indexes.py ← all performance indexes</code></pre>
+
+  <h3>env.py — Async Config</h3>
+  <pre><code">from alembic import context
+from sqlalchemy.ext.asyncio import create_async_engine
+from app.models import Base
+from app.core.config import settings
+
+def run_migrations_online():
+    connectable = create_async_engine(settings.DATABASE_URL)
+    with connectable.connect() as connection:
+        context.configure(connection=connection, target_metadata=Base.metadata)
+        with context.begin_transaction():
+            context.run_migrations()</code></pre>
+
+  <h3>Commands</h3>
+  <pre><code">cd backend
+alembic upgrade head           # apply all pending migrations
+alembic revision --autogenerate -m "description"  # generate new migration
+alembic downgrade -1           # roll back one migration
+alembic history                # show migration history</code></pre>
+
+  <div class="sh" id="s7"><span class="snum s7">7</span><h2 class="stit">Query Patterns</h2></div>
+  <h3>Fetch Last N Candles (optimized)</h3>
+  <pre><code">SELECT time, open, high, low, close, volume
+FROM ohlcv_candles
+WHERE symbol = 'XAUUSD' AND timeframe = 'H1'
+ORDER BY time DESC
+LIMIT 500;
+-- TimescaleDB uses chunk exclusion — only scans relevant partitions</code></pre>
+
+  <h3>Candle Range Query</h3>
+  <pre><code">SELECT * FROM ohlcv_candles
+WHERE symbol = $1 AND timeframe = $2
+  AND time >= $3 AND time < $4
+ORDER BY time ASC;</code></pre>
+
+  <h3>Daily P&L Aggregation</h3>
+  <pre><code">SELECT DATE(closed_at) as day,
+       COUNT(*) as trade_count,
+       SUM(pnl_usd) as daily_pnl,
+       COUNT(*) FILTER (WHERE pnl_usd > 0) as wins
+FROM trades
+WHERE status = 'CLOSED' AND closed_at >= NOW() - INTERVAL '30 days'
+GROUP BY 1 ORDER BY 1;</code></pre>
+
+  <h3>Equity Curve</h3>
+  <pre><code">SELECT closed_at, SUM(pnl_usd) OVER (ORDER BY closed_at) as equity
+FROM trades
+WHERE status = 'CLOSED'
+ORDER BY closed_at;</code></pre>
+
+  <div class="sh" id="s8"><span class="snum s8">8</span><h2 class="stit">Data Retention</h2></div>
+  <table>
+    <thead><tr><th>Table</th><th>Retention Policy</th><th>Reason</th></tr></thead>
+    <tbody>
+      <tr><td>ohlcv_candles M1</td><td>90 days</td><td>M1 data is large; 90d sufficient for SMC lookback</td></tr>
+      <tr><td>ohlcv_candles M5–H1</td><td>2 years</td><td>Medium term analysis</td></tr>
+      <tr><td>ohlcv_candles H4–D1</td><td>Indefinite</td><td>Long term structure, small row count</td></tr>
+      <tr><td>trades</td><td>Indefinite</td><td>Full audit trail required</td></tr>
+      <tr><td>signals</td><td>1 year</td><td>Strategy analytics window</td></tr>
+      <tr><td>smc_zones</td><td>Active only (pruned daily)</td><td>Invalid zones removed by background job</td></tr>
+    </tbody>
+  </table>
+  <pre><code">-- TimescaleDB automatic retention policy for M1 data
+SELECT add_retention_policy('ohlcv_candles', INTERVAL '90 days',
+    config => jsonb_build_object('timeframe', 'M1'));</code></pre>
+
+</main>
+<script>
+function toggleTheme(){var h=document.documentElement,d=h.getAttribute('data-theme')==='dark';if(d){h.removeAttribute('data-theme');localStorage.setItem('docportal-theme','light');document.getElementById('ti').innerHTML='&#9788;';}else{h.setAttribute('data-theme','dark');localStorage.setItem('docportal-theme','dark');document.getElementById('ti').innerHTML='&#9790;';}}
+(function(){var s=localStorage.getItem('docportal-theme');if(s==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('ti').innerHTML='&#9790;';}})();
+var secs=document.querySelectorAll('.sh[id]'),links=document.querySelectorAll('.toc a'),c=document.querySelector('.content');
+c.addEventListener('scroll',function(){var cur='';secs.forEach(function(s){if(c.scrollTop>=s.offsetTop-c.offsetTop-100)cur=s.id;});links.forEach(function(l){l.classList.remove('active');if(l.getAttribute('href')==='#'+cur)l.classList.add('active');});});
+links.forEach(function(l){l.addEventListener('click',function(e){e.preventDefault();var t=document.querySelector(l.getAttribute('href'));if(t)c.scrollTo({top:t.offsetTop-c.offsetTop-20,behavior:'smooth'});});});
+</script>
+</body>
+</html>

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AITrading Dashboard — Prototype</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--bg:#0f0f23;--header:#1a1a2e;--sidebar:#16213e;--card:#1e1e3a;--card2:#252547;--accent:#e94560;--text:#eee;--text-dim:#94a3b8;--text-muted:#64748b;--border:#1e3a5f;--green:#10b981;--red:#ef4444;--blue:#3b82f6;--orange:#f97316;--purple:#8b5cf6}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column}
+  /* HEADER */
+  .header{height:52px;background:var(--header);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px;flex-shrink:0}
+  .logo{width:30px;height:30px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;color:#fff}
+  .header-brand{font-size:15px;font-weight:700;letter-spacing:-.3px}
+  .header-sep{width:1px;height:24px;background:var(--border)}
+  .symbol-select{background:var(--card2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:4px 10px;font-size:13px;font-weight:600;cursor:pointer}
+  .tf-group{display:flex;gap:3px}
+  .tf-btn{padding:3px 9px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;background:transparent;border:1px solid var(--border);color:var(--text-dim);transition:all .15s}
+  .tf-btn.active,.tf-btn:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+  .header-spacer{flex:1}
+  .status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .dot-green{background:var(--green)}.dot-red{background:var(--red)}.dot-orange{background:var(--orange)}
+  .status-label{font-size:12px;font-weight:600}
+  .header-price{font-size:16px;font-weight:700;letter-spacing:-.3px}
+  .price-change{font-size:12px;font-weight:600}
+  .up{color:var(--green)}.dn{color:var(--red)}
+  .btn{padding:5px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+  .btn-danger{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+  .btn-primary{background:var(--accent);color:#fff}
+  /* MAIN LAYOUT */
+  .main{flex:1;display:flex;overflow:hidden}
+  /* LEFT PANEL */
+  .left-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--border)}
+  /* CHART AREA */
+  .chart-area{flex:1;background:var(--card);position:relative;overflow:hidden}
+  .chart-placeholder{width:100%;height:100%;display:flex;flex-direction:column;padding:16px}
+  .chart-controls{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .indicator-btn{padding:3px 10px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid;transition:all .15s}
+  .ind-ema20{background:rgba(59,130,246,.15);color:#3b82f6;border-color:rgba(59,130,246,.3)}
+  .ind-ema50{background:rgba(249,115,22,.15);color:#f97316;border-color:rgba(249,115,22,.3)}
+  .ind-ema200{background:rgba(239,68,68,.15);color:#ef4444;border-color:rgba(239,68,68,.3)}
+  .ind-fib{background:rgba(245,158,11,.15);color:#f59e0b;border-color:rgba(245,158,11,.3)}
+  .ind-ob{background:rgba(16,185,129,.15);color:#10b981;border-color:rgba(16,185,129,.3)}
+  .ind-fvg{background:rgba(139,92,246,.15);color:#8b5cf6;border-color:rgba(139,92,246,.3)}
+  .ind-macd{background:rgba(6,182,212,.15);color:#06b6d4;border-color:rgba(6,182,212,.3)}
+  /* SVG CHART */
+  .chart-svg-wrap{flex:1;position:relative}
+  svg.chart{width:100%;height:100%;display:block}
+  /* BOTTOM DRAWER */
+  .bottom-drawer{height:220px;background:var(--card);border-top:1px solid var(--border);flex-shrink:0;display:flex;flex-direction:column}
+  .drawer-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);flex-shrink:0}
+  .tab{padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text-muted);border-bottom:2px solid transparent;transition:all .15s}
+  .tab.active{color:var(--text);border-bottom-color:var(--accent)}
+  .tab-content{flex:1;overflow-y:auto;padding:12px 16px}
+  .tab-pane{display:none}.tab-pane.active{display:block}
+  /* TRADE TABLE */
+  .trade-table{width:100%;border-collapse:collapse;font-size:12px}
+  .trade-table th{color:var(--text-muted);font-weight:600;text-align:left;padding:4px 8px;text-transform:uppercase;font-size:11px;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+  .trade-table td{padding:6px 8px;color:var(--text-dim);border-bottom:1px solid rgba(30,58,95,.5)}
+  .trade-table tr:hover td{background:rgba(233,69,96,.04)}
+  /* RIGHT PANEL */
+  .right-panel{width:280px;display:flex;flex-direction:column;overflow:hidden;background:var(--card)}
+  .panel-header{padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+  .panel-badge{font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(16,185,129,.15);color:var(--green);font-weight:600}
+  .positions-list{flex:1;overflow-y:auto;padding:8px}
+  .position-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;border-left:3px solid}
+  .pos-buy{border-left-color:var(--green)}.pos-sell{border-left-color:var(--red)}
+  .pos-top{display:flex;justify-content:space-between;margin-bottom:6px}
+  .pos-symbol{font-size:14px;font-weight:700}
+  .pos-dir{font-size:11px;font-weight:700;padding:1px 8px;border-radius:5px}
+  .dir-buy{background:rgba(16,185,129,.15);color:var(--green)}.dir-sell{background:rgba(239,68,68,.15);color:var(--red)}
+  .pos-mid{display:flex;justify-content:space-between;margin-bottom:6px}
+  .pos-info{font-size:11px;color:var(--text-muted)}
+  .pos-pnl{font-size:15px;font-weight:700}
+  .pos-bot{display:flex;justify-content:space-between}
+  .pos-detail{font-size:11px;color:var(--text-dim)}
+  .close-btn{font-size:11px;padding:2px 8px;border-radius:5px;background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3);cursor:pointer}
+  /* AI CHAT */
+  .ai-panel{display:flex;flex-direction:column;height:100%;overflow:hidden}
+  .chat-messages{flex:1;overflow-y:auto;padding:8px}
+  .msg{margin-bottom:10px;display:flex;gap:8px;align-items:flex-start}
+  .msg-avatar{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+  .avatar-user{background:rgba(233,69,96,.2);color:var(--accent)}
+  .avatar-ai{background:rgba(139,92,246,.2);color:var(--purple)}
+  .msg-body{font-size:12px;color:var(--text-dim);line-height:1.5;background:var(--card2);border-radius:8px;padding:8px 12px;flex:1}
+  .msg-body strong{color:var(--text)}
+  .chat-input-wrap{padding:8px;border-top:1px solid var(--border);display:flex;gap:6px;flex-shrink:0}
+  .chat-input{flex:1;background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;outline:none}
+  .chat-input:focus{border-color:var(--accent)}
+  .chat-send{padding:6px 12px;background:var(--accent);border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;cursor:pointer}
+  /* RISK BAR */
+  .risk-bar{padding:8px 16px;background:var(--card2);border-top:1px solid var(--border);display:flex;align-items:center;gap:16px;font-size:11px;flex-shrink:0}
+  .risk-item{display:flex;flex-direction:column;gap:1px}
+  .risk-label{color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+  .risk-value{font-weight:700;font-size:12px}
+  .risk-progress{flex:1;height:4px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden}
+  .risk-fill{height:100%;border-radius:2px;background:var(--green);transition:width .5s}
+  /* PROTO BADGE */
+  .proto-badge{position:fixed;bottom:16px;right:16px;background:rgba(233,69,96,.9);color:#fff;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;z-index:9999;backdrop-filter:blur(4px)}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">AT</div>
+  <div class="header-brand">AITrading</div>
+  <div class="header-sep"></div>
+  <select class="symbol-select" onchange="updateSymbol(this.value)">
+    <option value="XAUUSD">XAU/USD</option>
+    <option value="EURUSD">EUR/USD</option>
+    <option value="GBPUSD">GBP/USD</option>
+    <option value="BTCUSD">BTC/USD</option>
+  </select>
+  <div class="tf-group">
+    <div class="tf-btn" onclick="setTF(this,'M5')">M5</div>
+    <div class="tf-btn" onclick="setTF(this,'M15')">M15</div>
+    <div class="tf-btn active" onclick="setTF(this,'H1')">H1</div>
+    <div class="tf-btn" onclick="setTF(this,'H4')">H4</div>
+    <div class="tf-btn" onclick="setTF(this,'D1')">D1</div>
+  </div>
+  <div class="header-spacer"></div>
+  <div class="status-dot dot-green" title="MT5 Connected"></div>
+  <span class="status-label" style="color:var(--green)">MT5 Connected</span>
+  <div class="header-sep"></div>
+  <div class="status-dot dot-green"></div>
+  <span class="status-label" id="trading-mode">Demo Mode</span>
+  <div class="header-sep"></div>
+  <div class="header-price" id="live-price">2,358.42</div>
+  <div class="price-change up" id="price-change">▲ +4.21 (0.18%)</div>
+  <div class="header-sep"></div>
+  <button class="btn btn-danger" onclick="toggleHalt()">⏸ Pause All</button>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="main">
+
+  <!-- LEFT PANEL: CHART + DRAWER -->
+  <div class="left-panel">
+    <div class="chart-area">
+      <div class="chart-placeholder">
+        <div class="chart-controls">
+          <div class="indicator-btn ind-ema20">EMA 20</div>
+          <div class="indicator-btn ind-ema50">EMA 50</div>
+          <div class="indicator-btn ind-ema200">EMA 200</div>
+          <div class="indicator-btn ind-fib">Fibonacci</div>
+          <div class="indicator-btn ind-ob">Order Blocks</div>
+          <div class="indicator-btn ind-fvg">FVG</div>
+          <div class="indicator-btn ind-macd">MACD</div>
+        </div>
+        <div class="chart-svg-wrap">
+          <svg class="chart" id="chart-svg" viewBox="0 0 800 280" preserveAspectRatio="none">
+            <!-- Grid lines -->
+            <line x1="0" y1="60" x2="800" y2="60" stroke="#1e3a5f" stroke-width="0.5"/>
+            <line x1="0" y1="120" x2="800" y2="120" stroke="#1e3a5f" stroke-width="0.5"/>
+            <line x1="0" y1="180" x2="800" y2="180" stroke="#1e3a5f" stroke-width="0.5"/>
+            <line x1="0" y1="240" x2="800" y2="240" stroke="#1e3a5f" stroke-width="0.5"/>
+            <!-- Fibonacci zones (semi-transparent) -->
+            <rect x="0" y="90" width="800" height="30" fill="rgba(245,158,11,0.06)"/>
+            <text x="5" y="100" fill="#f59e0b" font-size="9" opacity="0.8">61.8% — 2,345.20</text>
+            <rect x="0" y="140" width="800" height="20" fill="rgba(245,158,11,0.04)"/>
+            <text x="5" y="152" fill="#f59e0b" font-size="9" opacity="0.7">50.0% — 2,340.00</text>
+            <!-- Order Block zone -->
+            <rect x="0" y="155" width="800" height="25" fill="rgba(16,185,129,0.08)" stroke="rgba(16,185,129,0.3)" stroke-width="0.5" stroke-dasharray="4"/>
+            <text x="5" y="170" fill="#10b981" font-size="9" opacity="0.8">OB Bullish</text>
+            <!-- FVG zone -->
+            <rect x="520" y="75" width="130" height="18" fill="rgba(139,92,246,0.1)" stroke="rgba(139,92,246,0.3)" stroke-width="0.5"/>
+            <text x="525" y="87" fill="#8b5cf6" font-size="8">FVG</text>
+            <!-- EMA 200 line -->
+            <polyline points="0,210 80,205 160,198 240,195 320,192 400,188 480,182 560,178 640,175 720,172 800,170" fill="none" stroke="#ef4444" stroke-width="1.5" opacity="0.7"/>
+            <!-- EMA 50 line -->
+            <polyline points="0,190 80,185 160,178 240,175 320,168 400,162 480,158 560,150 640,145 720,140 800,138" fill="none" stroke="#f97316" stroke-width="1.5" opacity="0.8"/>
+            <!-- EMA 20 line -->
+            <polyline points="0,172 80,165 160,158 240,148 320,140 400,130 480,118 560,112 640,108 720,102 800,98" fill="none" stroke="#3b82f6" stroke-width="1.5" opacity="0.9"/>
+            <!-- Candlesticks (simplified) -->
+            <g id="candles"></g>
+            <!-- BOS marker -->
+            <line x1="480" y1="50" x2="480" y2="280" stroke="#10b981" stroke-width="0.7" stroke-dasharray="4" opacity="0.5"/>
+            <text x="484" y="62" fill="#10b981" font-size="9" font-weight="700">BOS ↑</text>
+            <!-- Signal marker -->
+            <polygon points="640,95 648,110 632,110" fill="#e94560" opacity="0.9"/>
+            <text x="620" y="90" fill="#e94560" font-size="10" font-weight="700">BUY</text>
+            <!-- Price labels right side -->
+            <text x="762" y="64" fill="#94a3b8" font-size="9">2,368</text>
+            <text x="762" y="124" fill="#94a3b8" font-size="9">2,355</text>
+            <text x="762" y="184" fill="#94a3b8" font-size="9">2,342</text>
+            <text x="762" y="244" fill="#94a3b8" font-size="9">2,329</text>
+          </svg>
+          <script>
+            // Draw simple candles
+            var svg = document.getElementById('candles');
+            var data = [
+              [1,195,210,185,200],[1,200,215,193,208],[1,208,222,200,218],[0,218,220,205,207],
+              [1,207,225,205,222],[1,222,235,218,230],[0,230,232,218,220],[1,220,235,218,232],
+              [1,232,245,228,240],[1,240,252,235,248],[0,248,250,235,238],[1,238,252,235,250],
+              [0,250,252,238,240],[1,240,255,238,252],[1,252,262,248,258],[0,258,260,245,248],
+              [1,248,260,245,258],[1,258,268,254,264],[1,264,272,260,270],[0,270,272,258,260]
+            ];
+            var x = 18;
+            data.forEach(function(d) {
+              var bull = d[0];
+              var o = d[1], h = d[2], l = d[3], c = d[4];
+              // Map price 180-280 → y 280-0 (inverted)
+              function py(p){ return 280 - ((p-150)/(150)*200); }
+              var color = bull ? '#10b981' : '#ef4444';
+              var wick = document.createElementNS('http://www.w3.org/2000/svg','line');
+              wick.setAttribute('x1',x+4); wick.setAttribute('x2',x+4);
+              wick.setAttribute('y1',py(h)); wick.setAttribute('y2',py(l));
+              wick.setAttribute('stroke',color); wick.setAttribute('stroke-width','1');
+              svg.appendChild(wick);
+              var rect = document.createElementNS('http://www.w3.org/2000/svg','rect');
+              var top = Math.min(py(o),py(c));
+              var ht = Math.abs(py(o)-py(c))||2;
+              rect.setAttribute('x',x); rect.setAttribute('y',top);
+              rect.setAttribute('width',8); rect.setAttribute('height',ht);
+              rect.setAttribute('fill',color); rect.setAttribute('rx','1');
+              svg.appendChild(rect);
+              x += 14;
+            });
+          </script>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM DRAWER -->
+    <div class="bottom-drawer">
+      <div class="drawer-tabs">
+        <div class="tab active" onclick="switchTab(this,'trades')">Trade History</div>
+        <div class="tab" onclick="switchTab(this,'analytics')">Analytics</div>
+        <div class="tab" onclick="switchTab(this,'strategies')">Strategies</div>
+        <div class="tab" onclick="switchTab(this,'signals')">Signals</div>
+      </div>
+      <div class="tab-content">
+        <div class="tab-pane active" id="pane-trades">
+          <table class="trade-table">
+            <thead><tr><th>#</th><th>Symbol</th><th>Dir</th><th>Lots</th><th>Entry</th><th>SL</th><th>TP</th><th>Exit</th><th>P&L</th><th>Strategy</th><th>Time</th></tr></thead>
+            <tbody>
+              <tr><td>#1289</td><td>XAUUSD</td><td style="color:var(--green);font-weight:700">BUY</td><td>0.10</td><td>2,328.50</td><td>2,310.00</td><td>2,385.00</td><td>2,358.20</td><td style="color:var(--green);font-weight:700">+$298</td><td>ema_macd_xauusd</td><td>Today 08:00</td></tr>
+              <tr><td>#1288</td><td>EURUSD</td><td style="color:var(--red);font-weight:700">SELL</td><td>0.05</td><td>1.0852</td><td>1.0880</td><td>1.0810</td><td>1.0815</td><td style="color:var(--green);font-weight:700">+$185</td><td>smc_h1_eurusd</td><td>Yesterday</td></tr>
+              <tr><td>#1287</td><td>XAUUSD</td><td style="color:var(--red);font-weight:700">SELL</td><td>0.10</td><td>2,368.00</td><td>2,385.00</td><td>2,330.00</td><td>2,374.50</td><td style="color:var(--red);font-weight:700">-$65</td><td>ema_macd_xauusd</td><td>2 days ago</td></tr>
+              <tr><td>#1286</td><td>BTCUSD</td><td style="color:var(--green);font-weight:700">BUY</td><td>0.01</td><td>67,250</td><td>65,000</td><td>72,000</td><td>71,820</td><td style="color:var(--green);font-weight:700">+$457</td><td>grid_btcusd</td><td>3 days ago</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="tab-pane" id="pane-analytics">
+          <div style="display:flex;gap:24px;flex-wrap:wrap">
+            <div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px 20px;min-width:120px">
+              <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Win Rate</div>
+              <div style="font-size:22px;font-weight:700;color:var(--green)">67%</div>
+            </div>
+            <div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px 20px;min-width:120px">
+              <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Avg R:R</div>
+              <div style="font-size:22px;font-weight:700;color:var(--blue)">2.8:1</div>
+            </div>
+            <div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px 20px;min-width:120px">
+              <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Total P&L</div>
+              <div style="font-size:22px;font-weight:700;color:var(--green)">+$875</div>
+            </div>
+            <div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px 20px;min-width:120px">
+              <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Max DD</div>
+              <div style="font-size:22px;font-weight:700;color:var(--orange)">-3.2%</div>
+            </div>
+            <div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px 20px;min-width:120px">
+              <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Trades</div>
+              <div style="font-size:22px;font-weight:700">48</div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane" id="pane-strategies">
+          <table class="trade-table">
+            <thead><tr><th>Strategy</th><th>Symbol</th><th>TF</th><th>Mode</th><th>Signals</th><th>Win%</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td style="font-weight:700">ema_macd_xauusd</td><td>XAUUSD</td><td>H1</td><td>Normal</td><td>32</td><td style="color:var(--green)">72%</td><td style="color:var(--green)">● Active</td><td><button class="btn" style="background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3);padding:2px 8px;font-size:11px;border-radius:4px;cursor:pointer">Pause</button></td></tr>
+              <tr><td style="font-weight:700">smc_h1_eurusd</td><td>EURUSD</td><td>H1</td><td>Normal</td><td>18</td><td style="color:var(--green)">61%</td><td style="color:var(--green)">● Active</td><td><button class="btn" style="background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3);padding:2px 8px;font-size:11px;border-radius:4px;cursor:pointer">Pause</button></td></tr>
+              <tr><td style="font-weight:700">grid_btcusd</td><td>BTCUSD</td><td>H4</td><td>Grid</td><td>8</td><td style="color:var(--blue)">N/A</td><td style="color:var(--orange)">● Paused</td><td><button class="btn btn-primary" style="padding:2px 8px;font-size:11px;border-radius:4px;cursor:pointer">Activate</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="tab-pane" id="pane-signals">
+          <table class="trade-table">
+            <thead><tr><th>Time</th><th>Strategy</th><th>Symbol</th><th>Signal</th><th>Status</th><th>Reason</th></tr></thead>
+            <tbody>
+              <tr><td>10:02</td><td>ema_macd_xauusd</td><td>XAUUSD</td><td style="color:var(--green)">BUY</td><td style="color:var(--green)">✓ Executed</td><td>EMA cross + MACD bull + FIB 61.8</td></tr>
+              <tr><td>09:15</td><td>smc_h1_eurusd</td><td>EURUSD</td><td style="color:var(--red)">SELL</td><td style="color:var(--orange)">⚠ Rejected</td><td>Daily loss cap reached</td></tr>
+              <tr><td>08:00</td><td>ema_macd_xauusd</td><td>XAUUSD</td><td style="color:var(--green)">BUY</td><td style="color:var(--green)">✓ Executed</td><td>EMA cross + MACD bull</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- RISK BAR -->
+    <div class="risk-bar">
+      <div class="risk-item"><div class="risk-label">Daily P&L</div><div class="risk-value up">+$298</div></div>
+      <div class="risk-item"><div class="risk-label">Daily Loss Cap</div><div class="risk-value">$200</div></div>
+      <div style="display:flex;flex-direction:column;gap:3px;flex:1;max-width:120px">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted)"><span>Used</span><span>0%</span></div>
+        <div class="risk-progress"><div class="risk-fill" style="width:0%"></div></div>
+      </div>
+      <div class="risk-item"><div class="risk-label">Open Pos</div><div class="risk-value">2 / 5</div></div>
+      <div class="risk-item"><div class="risk-label">Balance</div><div class="risk-value">$10,298</div></div>
+      <div class="risk-item"><div class="risk-label">Mode</div><div class="risk-value" style="color:var(--orange)">DEMO</div></div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL: POSITIONS + AI CHAT -->
+  <div class="right-panel">
+    <div class="panel-header">
+      Live Positions
+      <span class="panel-badge">2 Open</span>
+    </div>
+    <div class="positions-list" style="flex:0;max-height:200px;overflow-y:auto">
+      <div class="position-card pos-buy">
+        <div class="pos-top">
+          <div class="pos-symbol">XAUUSD</div>
+          <div class="pos-dir dir-buy">BUY</div>
+        </div>
+        <div class="pos-mid">
+          <div class="pos-info">0.10 lots · #1289</div>
+          <div class="pos-pnl up">+$298.40</div>
+        </div>
+        <div class="pos-bot">
+          <div class="pos-detail">Entry: 2,328.50 · SL: 2,310 · TP: 2,385</div>
+          <button class="close-btn">Close</button>
+        </div>
+      </div>
+      <div class="position-card pos-buy">
+        <div class="pos-top">
+          <div class="pos-symbol">EURUSD</div>
+          <div class="pos-dir dir-buy">BUY</div>
+        </div>
+        <div class="pos-mid">
+          <div class="pos-info">0.05 lots · #1290</div>
+          <div class="pos-pnl up">+$42.10</div>
+        </div>
+        <div class="pos-bot">
+          <div class="pos-detail">Entry: 1.0780 · SL: 1.0760 · TP: 1.0840</div>
+          <button class="close-btn">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-header" style="border-top:1px solid var(--border)">
+      Claude AI Co-pilot
+      <span style="font-size:11px;color:var(--purple);background:rgba(139,92,246,.15);padding:2px 8px;border-radius:10px;font-weight:600">claude-opus-4-8</span>
+    </div>
+    <div class="ai-panel">
+      <div class="chat-messages" id="chat-msgs">
+        <div class="msg">
+          <div class="msg-avatar avatar-user">U</div>
+          <div class="msg-body">What does the XAUUSD H1 setup look like right now?</div>
+        </div>
+        <div class="msg">
+          <div class="msg-avatar avatar-ai">AI</div>
+          <div class="msg-body"><strong>XAUUSD H1 Analysis:</strong><br><br>
+            <strong>Trend:</strong> Bullish — price above EMA 20/50/200 stack. BOS confirmed at 2,340.<br><br>
+            <strong>SMC:</strong> Bullish OB at 2,328–2,335 holding as support. FVG between 2,348–2,352 acting as resistance.<br><br>
+            <strong>Fibonacci:</strong> Price currently at 61.8% retracement (2,345). Break above opens path to 78.6% at 2,368.<br><br>
+            <strong>Bias:</strong> <span style="color:var(--green);font-weight:700">Bullish</span> — look for long entries on pullback to OB zone with MACD confirmation.
+          </div>
+        </div>
+      </div>
+      <div class="chat-input-wrap">
+        <input class="chat-input" id="chat-in" placeholder="Ask about market setup, strategy, risk..." onkeydown="if(event.key==='Enter')sendMsg()">
+        <button class="chat-send" onclick="sendMsg()">Send</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="proto-badge">UI Prototype — Not Functional</div>
+
+<script>
+  function setTF(el, tf) {
+    document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+  }
+  function switchTab(el, tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('pane-'+tab).classList.add('active');
+  }
+  function sendMsg() {
+    var inp = document.getElementById('chat-in');
+    var msgs = document.getElementById('chat-msgs');
+    if (!inp.value.trim()) return;
+    var um = document.createElement('div'); um.className = 'msg';
+    um.innerHTML = '<div class="msg-avatar avatar-user">U</div><div class="msg-body">'+inp.value+'</div>';
+    msgs.appendChild(um);
+    var am = document.createElement('div'); am.className = 'msg';
+    am.innerHTML = '<div class="msg-avatar avatar-ai">AI</div><div class="msg-body" style="color:var(--text-muted);font-style:italic">Analyzing market data...</div>';
+    msgs.appendChild(am);
+    msgs.scrollTop = msgs.scrollHeight;
+    inp.value = '';
+  }
+  function toggleHalt() {
+    alert('Prototype: Would halt all auto-trading strategies.');
+  }
+  function updateSymbol(s) {
+    // Update price display
+    var prices = {XAUUSD:'2,358.42',EURUSD:'1.0822',GBPUSD:'1.2745',BTCUSD:'68,452'};
+    document.getElementById('live-price').textContent = prices[s] || '—';
+  }
+  // Simulate live price update
+  setInterval(function(){
+    var p = document.getElementById('live-price');
+    var base = 2358.42;
+    var delta = (Math.random()-0.5)*0.8;
+    var newP = (base+delta).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+    p.textContent = newP;
+    var ch = document.getElementById('price-change');
+    var d = (delta*100).toFixed(2);
+    ch.textContent = (delta>=0?'▲ +':'▼ ')+Math.abs(d)+ ' ('+(Math.abs(delta/base*100)).toFixed(3)+'%)';
+    ch.className = 'price-change '+(delta>=0?'up':'dn');
+  }, 1800);
+</script>
+</body>
+</html>

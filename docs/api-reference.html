@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>API Reference — AITrading</title>
+<style>
+  :root{--bg:#0f1117;--surface:#1a1d27;--surface2:#222535;--border:#2a2d3e;--text:#e2e8f0;--muted:#8892a4;--accent:#6c63ff;--accent2:#38bdf8;--green:#22c55e;--red:#ef4444;--yellow:#f59e0b;--orange:#f97316;--code-bg:#0d1117;--code-border:#1e2433;--radius:8px;--font-mono:'JetBrains Mono','Fira Code','Consolas',monospace}
+  [data-theme="light"]{--bg:#f8fafc;--surface:#ffffff;--surface2:#f1f5f9;--border:#e2e8f0;--text:#0f172a;--muted:#64748b;--code-bg:#1e2433;--code-border:#2a3347}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;display:flex}
+  /* Sidebar */
+  nav{width:260px;min-width:260px;background:var(--surface);border-right:1px solid var(--border);height:100vh;position:sticky;top:0;overflow-y:auto;padding:0 0 40px}
+  .nav-header{padding:20px 20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .nav-logo{font-size:16px;font-weight:700;color:var(--accent)}
+  .nav-logo span{color:var(--text);font-weight:400}
+  .theme-btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:20px;cursor:pointer;font-size:11px}
+  .nav-section{padding:16px 20px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  nav a{display:block;padding:6px 20px 6px 28px;color:var(--muted);text-decoration:none;font-size:12px;border-left:2px solid transparent;transition:.15s}
+  nav a:hover,nav a.active{color:var(--text);border-left-color:var(--accent);background:linear-gradient(90deg,rgba(108,99,255,.06),transparent)}
+  nav a .method{display:inline-block;width:38px;font-size:9px;font-weight:700;font-family:var(--font-mono);padding:1px 4px;border-radius:3px;margin-right:6px;text-align:center}
+  .get{background:rgba(34,197,94,.15);color:var(--green)}
+  .post{background:rgba(56,189,248,.15);color:var(--accent2)}
+  .delete{background:rgba(239,68,68,.15);color:var(--red)}
+  .ws{background:rgba(245,158,11,.15);color:var(--yellow)}
+  /* Main */
+  main{flex:1;max-width:900px;padding:40px 48px;min-height:100vh}
+  h1{font-size:28px;font-weight:700;margin-bottom:8px}
+  h2{font-size:20px;font-weight:700;margin:48px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+  h3{font-size:15px;font-weight:600;margin:28px 0 10px}
+  p{color:var(--muted);margin-bottom:12px;max-width:700px}
+  .subtitle{color:var(--muted);font-size:15px;margin-bottom:32px}
+  /* Endpoint card */
+  .endpoint{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:28px;overflow:hidden}
+  .endpoint-header{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface2)}
+  .endpoint-header h4{font-size:14px;font-weight:600;margin:0;font-family:var(--font-mono)}
+  .method-badge{font-size:11px;font-weight:700;font-family:var(--font-mono);padding:3px 8px;border-radius:4px;white-space:nowrap}
+  .method-badge.GET{background:rgba(34,197,94,.15);color:var(--green)}
+  .method-badge.POST{background:rgba(56,189,248,.15);color:var(--accent2)}
+  .method-badge.DELETE{background:rgba(239,68,68,.15);color:var(--red)}
+  .method-badge.WS{background:rgba(245,158,11,.15);color:var(--yellow)}
+  .auth-badge{font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid var(--border);color:var(--muted)}
+  .auth-badge.required{border-color:rgba(108,99,255,.4);color:var(--accent)}
+  .auth-badge.webhook{border-color:rgba(245,158,11,.4);color:var(--yellow)}
+  .endpoint-body{padding:18px}
+  .endpoint-desc{color:var(--muted);margin-bottom:16px;font-size:13px}
+  /* Tabs */
+  .tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:16px}
+  .tab-btn{padding:6px 14px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;border-bottom:2px solid transparent;margin-bottom:-1px;transition:.15s}
+  .tab-btn.active{color:var(--text);border-bottom-color:var(--accent)}
+  .tab-pane{display:none}.tab-pane.active{display:block}
+  /* Code */
+  pre{background:var(--code-bg);border:1px solid var(--code-border);border-radius:6px;padding:16px;overflow-x:auto;font-family:var(--font-mono);font-size:12px;line-height:1.7;color:#e2e8f0;margin:0}
+  code{font-family:var(--font-mono);font-size:12px;background:var(--code-bg);padding:1px 5px;border-radius:3px;color:var(--accent2)}
+  .hl-key{color:#79c0ff}.hl-str{color:#a5d6ff}.hl-num{color:#f2cc60}.hl-bool{color:#f2cc60}.hl-comment{color:#8b949e}.hl-method{color:#7ee787}.hl-path{color:#ffa657}
+  /* Tables */
+  table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px}
+  th{text-align:left;padding:8px 10px;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:1px solid var(--border)}
+  td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--muted);vertical-align:top}
+  td:first-child{color:var(--text);font-family:var(--font-mono);font-size:11px}
+  td code{background:transparent;padding:0;color:var(--accent2)}
+  .req{color:var(--red);font-size:10px;font-weight:600}
+  .opt{color:var(--green);font-size:10px;font-weight:600}
+  /* Badges */
+  .badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.04em}
+  .badge-must{background:rgba(239,68,68,.15);color:var(--red)}
+  .badge-should{background:rgba(245,158,11,.15);color:var(--yellow)}
+  .badge-could{background:rgba(34,197,94,.15);color:var(--green)}
+  /* Status codes */
+  .status-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+  .status{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:4px 10px;font-family:var(--font-mono);font-size:11px}
+  .status .code{font-weight:700}
+  .s200{color:var(--green)}.s201{color:var(--green)}.s400{color:var(--yellow)}.s401{color:var(--red)}.s403{color:var(--red)}.s404{color:var(--yellow)}.s422{color:var(--orange)}.s429{color:var(--orange)}.s500{color:var(--red)}
+  /* Alert boxes */
+  .alert{border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:12px;border-left:3px solid}
+  .alert-info{background:rgba(56,189,248,.08);border-color:var(--accent2);color:var(--muted)}
+  .alert-warn{background:rgba(245,158,11,.08);border-color:var(--yellow);color:var(--muted)}
+  .alert-danger{background:rgba(239,68,68,.08);border-color:var(--red);color:var(--muted)}
+  .alert strong{color:var(--text)}
+  /* Section anchors */
+  [id]{scroll-margin-top:20px}
+</style>
+</head>
+<body>
+
+<nav id="sidebar">
+  <div class="nav-header">
+    <div class="nav-logo">AI<span>Trading</span></div>
+    <button class="theme-btn" onclick="toggleTheme()">☀ Light</button>
+  </div>
+
+  <div class="nav-section">Authentication</div>
+  <a href="#auth"><span class="method post">POST</span>Login</a>
+  <a href="#auth-refresh"><span class="method post">POST</span>Refresh</a>
+
+  <div class="nav-section">Webhooks</div>
+  <a href="#webhook-tv"><span class="method post">POST</span>TradingView</a>
+
+  <div class="nav-section">Market Data</div>
+  <a href="#candles"><span class="method get">GET</span>Candles</a>
+  <a href="#live-price"><span class="method get">GET</span>Live Price</a>
+  <a href="#symbols"><span class="method get">GET</span>Symbols</a>
+
+  <div class="nav-section">Analysis</div>
+  <a href="#indicators"><span class="method get">GET</span>Indicators</a>
+  <a href="#fibonacci"><span class="method get">GET</span>Fibonacci</a>
+  <a href="#smc"><span class="method get">GET</span>SMC Zones</a>
+  <a href="#volume-profile"><span class="method get">GET</span>Volume Profile</a>
+  <a href="#patterns"><span class="method get">GET</span>Candle Patterns</a>
+
+  <div class="nav-section">Signals</div>
+  <a href="#signals-list"><span class="method get">GET</span>List Signals</a>
+  <a href="#signals-create"><span class="method post">POST</span>Create Signal</a>
+  <a href="#signals-get"><span class="method get">GET</span>Get Signal</a>
+  <a href="#signals-delete"><span class="method delete">DEL</span>Delete Signal</a>
+
+  <div class="nav-section">Trades</div>
+  <a href="#trades-list"><span class="method get">GET</span>List Trades</a>
+  <a href="#trades-place"><span class="method post">POST</span>Place Order</a>
+  <a href="#trades-close"><span class="method post">POST</span>Close Position</a>
+  <a href="#positions"><span class="method get">GET</span>Open Positions</a>
+  <a href="#risk-state"><span class="method get">GET</span>Risk State</a>
+
+  <div class="nav-section">Strategies</div>
+  <a href="#strategies-list"><span class="method get">GET</span>List Strategies</a>
+  <a href="#strategies-get"><span class="method get">GET</span>Get Strategy</a>
+  <a href="#strategies-run"><span class="method post">POST</span>Run Eval</a>
+
+  <div class="nav-section">AI Co-pilot</div>
+  <a href="#ai-chat"><span class="method post">POST</span>Chat</a>
+  <a href="#ai-report"><span class="method get">GET</span>Daily Report</a>
+
+  <div class="nav-section">System</div>
+  <a href="#health"><span class="method get">GET</span>Health</a>
+
+  <div class="nav-section">WebSocket</div>
+  <a href="#ws-connect"><span class="method ws">WS</span>Connect</a>
+  <a href="#ws-events"><span class="method ws">WS</span>Events</a>
+
+  <div class="nav-section">Reference</div>
+  <a href="#error-codes">Error Codes</a>
+  <a href="#rate-limits">Rate Limits</a>
+  <a href="#enums">Enums</a>
+</nav>
+
+<main>
+  <h1>API Reference</h1>
+  <p class="subtitle">AITrading · FastAPI backend · Base URL: <code>http://localhost:8000</code></p>
+
+  <div class="alert alert-info">
+    <strong>Base URL:</strong> All endpoints are relative to <code>http://localhost:8000</code>.
+    WebSocket connects to <code>ws://localhost:8000/ws</code>.
+    Authentication uses JWT Bearer tokens — see the <a href="#auth" style="color:var(--accent2)">Authentication</a> section.
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       AUTHENTICATION
+  ════════════════════════════════════════════════════════════ -->
+  <h2 id="authentication">Authentication</h2>
+  <p>Single-user system. Password login returns a JWT access token (24h expiry).
+     Pass the token as <code>Authorization: Bearer &lt;token&gt;</code> on all protected endpoints.</p>
+
+  <div class="endpoint" id="auth">
+    <div class="endpoint-header">
+      <span class="method-badge POST">POST</span>
+      <h4>/auth/token</h4>
+      <span class="auth-badge">public</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Exchange password for JWT access token. Rate-limited to 10 requests/minute per IP.</p>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this,'req-auth-req')">Request</button>
+        <button class="tab-btn" onclick="switchTab(this,'req-auth-res')">Response</button>
+      </div>
+      <div class="tab-pane active" id="req-auth-req">
+        <p style="font-size:12px;color:var(--muted);margin-bottom:8px">Content-Type: <code>application/x-www-form-urlencoded</code></p>
+        <table>
+          <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+          <tr><td>username</td><td>string</td><td><span class="req">REQUIRED</span></td><td>Always <code>"trader"</code> (single-user system)</td></tr>
+          <tr><td>password</td><td>string</td><td><span class="req">REQUIRED</span></td><td>Configured via <code>TRADER_PASSWORD</code> env var</td></tr>
+        </table>
+        <pre><span class="hl-comment"># curl example</span>
+curl -X POST http://localhost:8000/auth/token \
+  -d <span class="hl-str">"username=trader&password=your_password"</span></pre>
+      </div>
+      <div class="tab-pane" id="req-auth-res">
+        <div class="status-list">
+          <span class="status"><span class="code s200">200</span>OK — token issued</span>
+          <span class="status"><span class="code s401">401</span>Invalid password</span>
+          <span class="status"><span class="code s429">429</span>Rate limit exceeded</span>
+        </div>
+        <pre>{
+  <span class="hl-key">"access_token"</span>: <span class="hl-str">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."</span>,
+  <span class="hl-key">"token_type"</span>: <span class="hl-str">"bearer"</span>,
+  <span class="hl-key">"expires_in"</span>: <span class="hl-num">86400</span>
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="endpoint" id="auth-refresh">
+    <div class="endpoint-header">
+      <span class="method-badge POST">POST</span>
+      <h4>/auth/refresh</h4>
+      <span class="auth-badge required">JWT required</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Issue a new token using a valid (not yet expired) existing token. Extends the session without re-entering the password.</p>
+      <pre><span class="hl-comment"># No body needed — pass existing token in Authorization header</span>
+curl -X POST http://localhost:8000/auth/refresh \
+  -H <span class="hl-str">"Authorization: Bearer &lt;current_token&gt;"</span></pre>
+      <div class="status-list">
+        <span class="status"><span class="code s200">200</span>New token</span>
+        <span class="status"><span class="code s401">401</span>Token expired or invalid</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       WEBHOOK
+  ════════════════════════════════════════════════════════════ -->
+  <h2 id="webhooks">TradingView Webhook</h2>
+  <p>Receives alert payloads from TradingView Pine Script. Signature-verified via HMAC-SHA256.</p>
+
+  <div class="alert alert-warn">
+    <strong>Signature Verification:</strong> Every request must include <code>X-TV-Signature</code> header:
+    <code>hmac-sha256=&lt;hex&gt;</code> where hex = HMAC-SHA256 of the raw request body with your
+    <code>TRADINGVIEW_WEBHOOK_SECRET</code>. Requests without a valid signature return <code>401</code>.
+    Verification uses <code>hmac.compare_digest</code> (constant-time) to prevent timing attacks.
+  </div>
+
+  <div class="endpoint" id="webhook-tv">
+    <div class="endpoint-header">
+      <span class="method-badge POST">POST</span>
+      <h4>/webhook/tradingview</h4>
+      <span class="auth-badge webhook">HMAC signed</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Receives TradingView strategy alerts. Parses the payload, queues a signal to Redis pub/sub, and persists to TimescaleDB.</p>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this,'tv-req')">Payload</button>
+        <button class="tab-btn" onclick="switchTab(this,'tv-pine')">Pine Script</button>
+        <button class="tab-btn" onclick="switchTab(this,'tv-res')">Response</button>
+      </div>
+      <div class="tab-pane active" id="tv-req">
+        <table>
+          <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+          <tr><td>symbol</td><td>string</td><td><span class="req">REQUIRED</span></td><td><code>"XAUUSD"</code> / <code>"EURUSD"</code> / <code>"BTCUSD"</code></td></tr>
+          <tr><td>action</td><td>string</td><td><span class="req">REQUIRED</span></td><td><code>"buy"</code> | <code>"sell"</code> | <code>"close"</code></td></tr>
+          <tr><td>price</td><td>float</td><td><span class="req">REQUIRED</span></td><td>Signal price at alert fire time</td></tr>
+          <tr><td>timeframe</td><td>string</td><td><span class="req">REQUIRED</span></td><td><code>"M15"</code> | <code>"H1"</code> | <code>"H4"</code> | <code>"D1"</code></td></tr>
+          <tr><td>strategy</td><td>string</td><td><span class="opt">OPTIONAL</span></td><td>YAML strategy name e.g. <code>"ema_macd_xauusd"</code></td></tr>
+          <tr><td>sl</td><td>float</td><td><span class="opt">OPTIONAL</span></td><td>Stop loss price (overrides strategy config)</td></tr>
+          <tr><td>tp</td><td>float</td><td><span class="opt">OPTIONAL</span></td><td>Take profit price (overrides strategy config)</td></tr>
+          <tr><td>comment</td><td>string</td><td><span class="opt">OPTIONAL</span></td><td>MT5 order comment (max 32 chars)</td></tr>
+        </table>
+        <pre>{
+  <span class="hl-key">"symbol"</span>:     <span class="hl-str">"XAUUSD"</span>,
+  <span class="hl-key">"action"</span>:     <span class="hl-str">"buy"</span>,
+  <span class="hl-key">"price"</span>:      <span class="hl-num">2341.50</span>,
+  <span class="hl-key">"timeframe"</span>:  <span class="hl-str">"H1"</span>,
+  <span class="hl-key">"strategy"</span>:   <span class="hl-str">"ema_macd_xauusd"</span>,
+  <span class="hl-key">"sl"</span>:         <span class="hl-num">2325.00</span>,
+  <span class="hl-key">"tp"</span>:         <span class="hl-num">2380.00</span>,
+  <span class="hl-key">"comment"</span>:    <span class="hl-str">"TV_EMA_CROSS"</span>
+}</pre>
+      </div>
+      <div class="tab-pane" id="tv-pine">
+        <pre><span class="hl-comment">// TradingView Pine Script alert payload template</span>
+<span class="hl-comment">// Message body (JSON):</span>
+{
+  "symbol":    "{{ticker}}",
+  "action":    "{{strategy.order.action}}",
+  "price":     {{close}},
+  "timeframe": "{{interval}}",
+  "strategy":  "ema_macd_xauusd",
+  "comment":   "TV_{{strategy.order.id}}"
+}
+
+<span class="hl-comment">// Webhook URL: http://&lt;your-ip&gt;:8000/webhook/tradingview</span>
+<span class="hl-comment">// The HMAC header is auto-added by your reverse proxy / script wrapper.</span>
+<span class="hl-comment">// Free TradingView plan = 15-min delay. Use MT5 feed as primary real-time source.</span></pre>
+      </div>
+      <div class="tab-pane" id="tv-res">
+        <div class="status-list">
+          <span class="status"><span class="code s200">200</span>Signal queued</span>
+          <span class="status"><span class="code s401">401</span>Invalid HMAC signature</span>
+          <span class="status"><span class="code s422">422</span>Validation error</span>
+          <span class="status"><span class="code s500">500</span>Internal error</span>
+        </div>
+        <pre><span class="hl-comment"># 200 — signal accepted</span>
+{
+  <span class="hl-key">"status"</span>:     <span class="hl-str">"queued"</span>,
+  <span class="hl-key">"signal_id"</span>:  <span class="hl-str">"sig_9f3a12c7"</span>,
+  <span class="hl-key">"received_at"</span>: <span class="hl-str">"2026-06-09T09:00:05Z"</span>
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       MARKET DATA
+  ════════════════════════════════════════════════════════════ -->
+  <h2 id="market-data">Market Data</h2>
+
+  <div class="endpoint" id="candles">
+    <div class="endpoint-header">
+      <span class="method-badge GET">GET</span>
+      <h4>/api/analysis/candles</h4>
+      <span class="auth-badge required">JWT required</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Return OHLCV candles from TimescaleDB. Paginated by limit/offset.</p>
+      <table>
+        <tr><th>Param</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        <tr><td>symbol</td><td>string</td><td><span class="req">required</span></td><td>e.g. <code>XAUUSD</code></td></tr>
+        <tr><td>timeframe</td><td>string</td><td><span class="req">required</span></td><td><code>M1</code> <code>M5</code> <code>M15</code> <code>H1</code> <code>H4</code> <code>D1</code></td></tr>
+        <tr><td>limit</td><td>int</td><td>200</td><td>Number of candles (max 1000)</td></tr>
+        <tr><td>from_ts</td><td>ISO 8601</td><td>—</td><td>Start timestamp filter</td></tr>
+        <tr><td>to_ts</td><td>ISO 8601</td><td>—</td><td>End timestamp filter</td></tr>
+      </table>
+      <pre><span class="hl-comment"># Response — array of candles (newest last)</span>
+{
+  <span class="hl-key">"symbol"</span>: <span class="hl-str">"XAUUSD"</span>, <span class="hl-key">"timeframe"</span>: <span class="hl-str">"H1"</span>, <span class="hl-key">"count"</span>: <span class="hl-num">200</span>,
+  <span class="hl-key">"candles"</span>: [
+    {
+      <span class="hl-key">"ts"</span>:     <span class="hl-str">"2026-06-09T08:00:00Z"</span>,
+      <span class="hl-key">"open"</span>:  <span class="hl-num">2338.10</span>,
+      <span class="hl-key">"high"</span>:  <span class="hl-num">2345.70</span>,
+      <span class="hl-key">"low"</span>:   <span class="hl-num">2334.50</span>,
+      <span class="hl-key">"close"</span>: <span class="hl-num">2341.20</span>,
+      <span class="hl-key">"volume"</span>:<span class="hl-num">12340</span>
+    }
+  ]
+}</pre>
+    </div>
+  </div>
+
+  <div class="endpoint" id="live-price">
+    <div class="endpoint-header">
+      <span class="method-badge GET">GET</span>
+      <h4>/api/analysis/price/{symbol}</h4>
+      <span class="auth-badge required">JWT required</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Latest bid/ask/spread from MT5 tick cache (Redis). Returns immediately from cache — no MT5 call.</p>
+      <pre>{
+  <span class="hl-key">"symbol"</span>: <span class="hl-str">"XAUUSD"</span>,
+  <span class="hl-key">"bid"</span>:    <span class="hl-num">2341.10</span>,
+  <span class="hl-key">"ask"</span>:    <span class="hl-num">2341.40</span>,
+  <span class="hl-key">"spread"</span>: <span class="hl-num">0.30</span>,
+  <span class="hl-key">"ts"</span>:     <span class="hl-str">"2026-06-09T09:00:01.342Z"</span>
+}</pre>
+    </div>
+  </div>
+
+  <div class="endpoint" id="symbols">
+    <div class="endpoint-header">
+      <span class="method-badge GET">GET</span>
+      <h4>/api/analysis/symbols</h4>
+      <span class="auth-badge required">JWT required</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">List of supported symbols with metadata.</p>
+      <pre>{
+  <span class="hl-key">"symbols"</span>: [
+    { <span class="hl-key">"symbol"</span>: <span class="hl-str">"XAUUSD"</span>, <span class="hl-key">"category"</span>: <span class="hl-str">"metal"</span>,  <span class="hl-key">"digits"</span>: <span class="hl-num">2</span>, <span class="hl-key">"active"</span>: <span class="hl-bool">true</span> },
+    { <span class="hl-key">"symbol"</span>: <span class="hl-str">"EURUSD"</span>, <span class="hl-key">"category"</span>: <span class="hl-str">"forex"</span>,  <span class="hl-key">"digits"</span>: <span class="hl-num">5</span>, <span class="hl-key">"active"</span>: <span class="hl-bool">true</span> },
+    { <span class="hl-key">"symbol"</span>: <span class="hl-str">"BTCUSD"</span>, <span class="hl-key">"category"</span>: <span class="hl-str">"crypto"</span>, <span class="hl-key">"digits"</span>: <span class="hl-num">2</span>, <span class="hl-key">"active"</span>: <span class="hl-bool">true</span> }
+  ]
+}</pre>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       ANALYSIS
+  ════════════════════════════════════════════════════════════ -->
+  <h2 id="analysis">Analysis</h2>
+
+  <div class="endpoint" id="indicators">
+    <div class="endpoint-header">
+      <span class="method-badge GET">GET</span>
+      <h4>/api/analysis/indicators</h4>
+      <span class="auth-badge required">JWT required</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Compute MACD + EMA (20/50/200) for the last N candles. Computed fresh from the OHLCV data in TimescaleDB using pandas-ta.</p>
+      <table>
+        <tr><th>Param</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        <tr><td>symbol</td><td>string</td><td><span class="req">required</span></td><td></td></tr>
+        <tr><td>timeframe</td><td>string</td><td><span class="req">required</span></td><td></td></tr>
+        <tr><td>limit</td><td>int</td><td>200</td><td>Candles to load for calculation (min 300 for EMA-200)</td></tr>
+      </table>
+      <pre>{
+  <span class="hl-key">"symbol"</span>: <span class="hl-str">"XAUUSD"</span>, <span class="hl-key">"timeframe"</span>: <span class="hl-str">"H1"</span>,
+  <span class="hl-key">"ema"</span>: {
+    <span class="hl-key">"ema20"</span>:  [<span class="hl-num">2330.4</span>, <span class="hl-num">2331.1</span>, <span class="hl-str">...</span>],
+    <span class="hl-key">"ema50"</span>:  [<span class="hl-num">2318.7</span>, <span class="hl-num">2319.2</span>, <span class="hl-str">...</span>],
+    <span class="hl-key">"ema200"</span>: [<span class="hl-num">2290.1</span>, <span class="hl-num">2290.8</span>, <span class="hl-str">...</span>]
+  },
+  <span class="hl-key">"macd"</span>: {
+    <span class="hl-key">"macd_line"</span>:   [<span class="hl-num">4.20</span>, <span class="hl-num">4.35</span>, <span class="hl-str">...</span>],
+    <span class="hl-key">"signal_line"</span>: [<span class="hl-num">3.90</span>, <span class="hl-num">4.05</span>, <span class="hl-str">...</span>],
+    <span class="hl-key">"histogram"</span>:   [<span class="hl-num">0.30</span>, <span class="hl-num">0.30</span>, <span class="hl-str">...</span>]
+  },
+  <span class="hl-key">"signal"</span>: {
+    <span class="hl-key">"ema_trend"</span>:    <span class="hl-str">"bullish"</span>,
+    <span class="hl-key">"macd_signal"</span>:  <span class="hl-str">"bullish_cross"</span>,
+    <span class="hl-key">"ema20_cross"</span>:  <span class="hl-str">"above_ema50"</span>
+  }
+}</pre>
+    </div>
+  </div>
+
+  <div class="endpoint" id="fibonacci">
+    <div class="endpoint-header">
+      <span class="method-badge GET">GET</span>
+      <h4>/api/analysis/fibonacci</h4>
+      <span class="auth-badge required">JWT required</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Compute Fibonacci retracement levels for a given swing high/low. Levels recompute on candle close (not per tick). Also returns Fibonacci Time Zones from the swing reference bar.</p>
+      <table>
+        <tr><th>Param</th><th>Type</th><th></th><th>Description</th></tr>
+        <tr><td>symbol</td><td>string</td><td><span class="req">required</span></td><td></td></tr>
+        <tr><td>swing_high</td><td>float</td><td><span class="req">required</span></td><td>Swing high price</td></tr>
+        <tr><td>swing_low</td><td>float</td><td><span class="req">required</span></td><td>Swing low price</td></tr>
+        <tr><td>direction</td><td>string</td><td><span class="req">required</span></td><td><code>bullish</code> | <code>bearish</code></td></tr>
+        <tr><td>swing_bar</td><td>int</td><td><span class="opt">optional</span></td><td>Bar index of swing reference (for time zones)</td></tr>
+      </table>
+      <pre>{
+  <span class="hl-key">"retracement"</span>: {
+    <span class="hl-key">"0"</span>:     <span class="hl-num">2300.00</span>,
+    <span class="hl-key">"23.6"</span>:  <span class="hl-num">2318.56</span>,
+    <span class="hl-key">"38.2"</span>:  <span class="hl-num">2327.64</span>,
+    <span class="hl-key">"50.0"</span>:  <span class="hl-num">2335.00</span>,
+    <span class="hl-key">"61.8"</span>:  <span class="hl-num">2342.36</span>,
+    <span class="hl-key">"78.6"</span>:  <span class="hl-num">2351.44</span>,
+    <span class="hl-key">"100"</span>:   <span class="hl-num">2370.00</span>
+  },
+  <span class="hl-key">"extension"</span>: {
+    <span class="hl-key">"127.2"</span>: <span class="hl-num">2388.56</span>,
+    <span class="hl-key">"161.8"</span>: <span class="hl-num">2415.44</span>
+  },
+  <span class="hl-key">"time_zones"</span>: [<span class="hl-num">1</span>, <span class="hl-num">2</span>, <span class="hl-num">3</span>, <span class="hl-num">5</span>, <span class="hl-num">8</span>, <span class="hl-num">13</span>, <span class="hl-num">21</span>, <span class="hl-num">34</span>]
+}</pre>
+    </div>
+  </div>
+
+  <div class="endpoint" id="smc">
+    <div class="endpoint-header">
+      <span class="method-badge GET">GET</span>
+      <h4>/api/analysis/smc</h4>
+      <span class="auth-badge required">JWT required</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Return all SMC zones detected on recent candles: Order Blocks, Fair Value Gaps, BOS/ChoCH events, Liquidity Sweeps, Demand/Supply zones.</p>
+      <table>
+        <tr><th>Param</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        <tr><td>symbol</td><td>string</td><td><span class="req">required</span></td><td></td></tr>
+        <tr><td>timeframe</td><td>string</td><td><span class="req">required</span></td><td></td></tr>
+        <tr><td>limit</td><td>int</td><td>500</td><td>Candles to scan</td></tr>
+      </table>
+      <pre>{
+  <span class="hl-key">"order_blocks"</span>: [
+    { <span class="hl-key">"type"</span>: <span class="hl-str">"bullish"</span>, <span class="hl-key">"top"</span>: <span class="hl-num">2335.80</span>, <span class="hl-key">"bottom"</span>: <span class="hl-num">2330.50</span>,
+      <span class="hl-key">"bar_index"</span>: <span class="hl-num">47</span>, <span class="hl-key">"mitigated"</span>: <span class="hl-bool">false</span> }
+  ],
+  <span class="hl-key">"fvg"</span>: [
+    { <span class="hl-key">"type"</span>: <span class="hl-str">"bullish"</span>, <span class="hl-key">"top"</span>: <span class="hl-num">2341.00</span>, <span class="hl-key">"bottom"</span>: <span class="hl-num">2338.20</span>,
+      <span class="hl-key">"bar_index"</span>: <span class="hl-num">52</span>, <span class="hl-key">"filled"</span>: <span class="hl-bool">false</span> }
+  ],
+  <span class="hl-key">"bos_choch"</span>: [
+    { <span class="hl-key">"type"</span>: <span class="hl-str">"BOS"</span>, <span class="hl-key">"direction"</span>: <span class="hl-str">"bullish"</span>,
+      <span class="hl-key">"price"</span>: <span class="hl-num">2340.00</span>, <span class="hl-key">"bar_index"</span>: <span class="hl-num">60</span> }
+  ],
+  <span class="hl-key">"liquidity_sweeps"</span>: [
+    { <span class="hl-key">"type"</span>: <span class="hl-str">"SSL"</span>, <span class="hl-key">"price"</span>: <span class="hl-num">2320.50</span>, <span class="hl-key">"bar_index"</span>: <span class="hl-num">38</span> }
+  ],
+  <span class="hl-key">"demand_zones"</span>: [
+    { <span class="hl-key">"top"</span>: <span class="hl-num">2336.00</span>, <span class="hl-key">"bottom"</span>: <span class="hl-num">2331.00</span>, <span class="hl-key">"strength"</span>: <span class="hl-num">3</span> }
+  ]
+}</pre>
+    </div>
+  </div>
+
+  <div class="endpoint" id="volume-profile">
+    <div class="endpoint-header">
+      <span class="method-badge GET">GET</span>
+      <h4>/api/analysis/volume-profile</h4>
+      <span class="auth-badge required">JWT required</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Compute Volume Profile (VPVR) for the specified range. Returns POC, VAH, VAL and the full volume distribution histogram.</p>
+      <table>
+        <tr><th>Param</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        <tr><td>symbol</td><td>string</td><td><span class="req">required</span></td><td></td></tr>
+        <tr><td>timeframe</td><td>string</td><td><span class="req">required</span></td><td></td></tr>
+        <tr><td>rows</td><td>int</td><td>24</td><td>Price buckets for histogram</td></tr>
+        <tr><td>limit</td><td>int</td><td>200</td><td>Candles to include</td></tr>
+      </table>
+      <pre>{
+  <span class="hl-key">"poc"</span>: <span class="hl-num">2336.50</span>,
+  <span class="hl-key">"vah"</span>: <span class="hl-num">2348.00</span>,
+  <span class="hl-key">"val"</span>: <span class="hl-num">2325.00</span>,
+  <span class="hl-key">"value_area_pct"</span>: <span class="hl-num">70.0</span>,
+  <span class="hl-key">"rows"</span>: [
+    { <span class="hl-key">"price_low"</span>: <span class="hl-num">2320.00</span>, <span class="hl-key">"price_high"</span>: <span class="hl-num">2322.50</span>, <span class="hl-key">"volume"</span>: <span class="hl-num">3210</span> },
+    { <span class="hl-key">"price_low"</span>: <span class="hl-num">2322.50</span>, <span class="hl-key">"price_high"</span>: <span class="hl-num">2325.00</span>, <span class="hl-key">"volume"</span>: <span class="hl-num">5430</span> }
+  ]
+}</pre>
+    </div>
+  </div>
+
+  <div class="endpoint" id="patterns">
+    <div class="endpoint-header">
+      <span class="method-badge GET">GET</span>
+      <h4>/api/analysis/patterns</h4>
+      <span class="auth-badge required">JWT required</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Detect candlestick patterns on recent candles using TA-Lib. Returns only the last N candles where a pattern was detected.</p>
+      <pre>{
+  <span class="hl-key">"patterns"</span>: [
+    { <span class="hl-key">"bar_index"</span>: <span class="hl-num">0</span>, <span class="hl-key">"ts"</span>: <span class="hl-str">"2026-06-09T09:00:00Z"</span>,
+      <span class="hl-key">"pattern"</span>: <span class="hl-str">"CDLENGULFING"</span>, <span class="hl-key">"signal"</span>: <span class="hl-num">100</span>,
+      <span class="hl-key">"description"</span>: <span class="hl-str">"Bullish Engulfing"</span> },
+    { <span class="hl-key">"bar_index"</span>: <span class="hl-num">-3</span>, <span class="hl-key">"ts"</span>: <span class="hl-str">"2026-06-09T06:00:00Z"</span>,
+      <span class="hl-key">"pattern"</span>: <span class="hl-str">"CDLHAMMER"</span>, <span class="hl-key">"signal"</span>: <span class="hl-num">100</span>,
+      <span class="hl-key">"description"</span>: <span class="hl-str">"Hammer"</span> }
+  ]
+}</pre>
+      <p style="font-size:11px;color:var(--muted);margin-top:8px">Signal value: <code>100</code> = bullish, <code>-100</code> = bearish, <code>200</code> = strong bullish</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       SIGNALS
+  ════════════════════════════════════════════════════════════ -->
+  <h2 id="signals">Signals</h2>
+
+  <div class="endpoint" id="signals-list">
+    <div class="endpoint-header">
+      <span class="method-badge GET">GET</span>
+      <h4>/api/signals</h4>
+      <span class="auth-badge required">JWT required</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">List signals with optional filters. Sorted by timestamp descending.</p>
+      <table>
+        <tr><th>Param</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        <tr><td>symbol</td><td>string</td><td>all</td><td>Filter by symbol</td></tr>
+        <tr><td>status</td><td>string</td><td>all</td><td><code>pending</code> | <code>executed</code> | <code>rejected</code> | <code>expired</code></td></tr>
+        <tr><td>source</td><td>string</td><td>all</td><td><code>tradingview</code> | <code>mt5</code> | <code>manual</code></td></tr>
+        <tr><td>limit</td><td>int</td><td>50</td><td>Max 200</td></tr>
+        <tr><td>offset</td><td>int</td><td>0</td><td>Pagination offset</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="endpoint" id="signals-create">
+    <div class="endpoint-header">
+      <span class="method-badge POST">POST</span>
+      <h4>/api/signals</h4>
+      <span class="auth-badge required">JWT required</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Manually create a signal (bypasses webhook flow). Useful for testing and manual trade execution.</p>
+      <pre>{
+  <span class="hl-key">"symbol"</span>:    <span class="hl-str">"XAUUSD"</span>,
+  <span class="hl-key">"action"</span>:    <span class="hl-str">"buy"</span>,
+  <span class="hl-key">"price"</span>:     <span class="hl-num">2341.50</span>,
+  <span class="hl-key">"timeframe"</span>: <span class="hl-str">"H1"</span>,
+  <span class="hl-key">"sl"</span>:        <span class="hl-num">2325.00</span>,
+  <span class="hl-key">"tp"</span>:        <span class="hl-num">2380.00</span>,
+  <span class="hl-key">"strategy"</span>:  <span class="hl-str">"ema_macd_xauusd"</span>
+}</pre>
+      <div class="status-list">
+        <span class="status"><span class="code s201">201</span>Signal created</span>
+        <span class="status"><span class="code s422">422</span>Validation error</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="endpoint" id="signals-get">
+    <div class="endpoint-header">
+      <span class="method-badge GET">GET</span>
+      <h4>/api/signals/{signal_id}</h4>
+      <span class="auth-badge required">JWT required</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Get a single signal by ID including its execution result if available.</p>
+      <div class="status-list">
+        <span class="status"><span class="code s200">200</span>Signal object</span>
+        <span class="status"><span class="code s404">404</span>Not found</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="endpoint" id="signals-delete">
+    <div class="endpoint-header">
+      <span class="method-badge DELETE">DELETE</span>
+      <h4>/api/signals/{signal_id}</h4>
+      <span class="auth-badge required">JWT required</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Cancel a pending signal. Has no effect on signals already in <code>executed</code> state.</p>
+      <div class="status-list">
+        <span class="status"><span class="code s200">200</span>Cancelled</span>
+        <span class="status"><span class="code s404">404</span>Not found</span>
+        <span class="status"><span class="code s400">400</span>Already executed</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       TRADES
+  ════════════════════════════════════════════════════════════ -->
+  <h2 id="trades">Trades &amp; Positions</h2>
+
+  <div class="endpoint" id="trades-list">
+    <div class="endpoint-header">
+      <span class="method-badge GET">GET</span>
+      <h4>/api/trades</h4>
+      <span class="auth-badge required">JWT required</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">List closed trade history from TimescaleDB. Sorted by close time descending.</p>
+      <table>
+        <tr><th>Param</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        <tr><td>symbol</td><td>string</td><td>all</td><td>Filter by symbol</td></tr>
+        <tr><td>from_date</td><td>date</td><td>—</td><td>ISO date filter start (inclusive)</td></tr>
+        <tr><td>to_date</td><td>date</td><td>—</td><td>ISO date filter end (inclusive)</td></tr>
+        <tr><td>limit</td><td>int</td><td>100</td><td>Max 500</td></tr>
+        <tr><td>offset</td><td>int</td><td>0</td><td>Pagination</td></tr>
+      </table>
+      <pre>{
+  <span class="hl-key">"total"</span>: <span class="hl-num">142</span>,
+  <span class="hl-key">"trades"</span>: [
+    {
+      <span class="hl-key">"id"</span>:         <span class="hl-str">"trd_a1b2c3d4"</span>,
+      <span class="hl-key">"symbol"</span>:     <span class="hl-str">"XAUUSD"</span>,
+      <span class="hl-key">"direction"</span>:  <span class="hl-str">"buy"</span>,
+      <span class="hl-key">"lot_size"</span>:   <span class="hl-num">0.10</span>,
+      <span class="hl-key">"open_price"</span>: <span class="hl-num">2341.50</span>,
+      <span class="hl-key">"close_price"</span>:<span class="hl-num">2361.20</span>,
+      <span class="hl-key">"sl"</span>:         <span class="hl-num">2325.00</span>,
+      <span class="hl-key">"tp"</span>:         <span class="hl-num">2380.00</span>,
+      <span class="hl-key">"pnl_usd"</span>:    <span class="hl-num">197.00</span>,
+      <span class="hl-key">"pips"</span>:       <span class="hl-num">197</span>,
+      <span class="hl-key">"open_at"</span>:    <span class="hl-str">"2026-06-09T08:12:00Z"</span>,
+      <span class="hl-key">"close_at"</span>:   <span class="hl-str">"2026-06-09T14:35:00Z"</span>,
+      <span class="hl-key">"strategy"</span>:   <span class="hl-str">"ema_macd_xauusd"</span>,
+      <span class="hl-key">"mt5_ticket"</span>: <span class="hl-num">12345678</span>,
+      <span class="hl-key">"status"</span>:     <span class="hl-str">"closed"</span>
+    }
+  ]
+}</pre>
+    </div>
+  </div>
+
+  <div class="endpoint" id="trades-place">
+    <div class="endpoint-header">
+      <span class="method-badge POST">POST</span>
+      <h4>/api/trades/order</h4>
+      <span class="auth-badge required">JWT required</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Place a market order directly via MT5. Risk manager enforces lot limits and daily loss cap before sending to MT5. Order is written to DB (status=PENDING) before MT5 call — audit trail is never lost.</p>
+      <div class="alert alert-danger">
+        <strong>Trading Safety:</strong> Setting <code>trading_mode=live</code> in env sends real orders to your broker.
+        Always test on demo first. The risk manager will reject orders that would breach the daily loss cap or exceed max open positions.
+      </div>
+      <table>
+        <tr><th>Field</th><th>Type</th><th></th><th>Description</th></tr>
+        <tr><td>symbol</td><td>string</td><td><span class="req">required</span></td><td></td></tr>
+        <tr><td>direction</td><td>string</td><td><span class="req">required</span></td><td><code>"buy"</code> | <code>"sell"</code></td></tr>
+        <tr><td>lot_size</td><td>float</td><td><span class="req">required</span></td><td>Position size in lots</td></tr>
+        <tr><td>sl</td><td>float</td><td><span class="opt">optional</span></td><td>Stop loss price</td></tr>
+        <tr><td>tp</td><td>float</td><td><span class="opt">optional</span></td><td>Take profit price</td></tr>
+        <tr><td>comment</td><td>string</td><td><span class="opt">optional</span></td><td>MT5 order comment</td></tr>
+        <tr><td>strategy</td><td>string</td><td><span class="opt">optional</span></td><td>Strategy name for trade tagging</td></tr>
+      </table>
+      <div class="status-list">
+        <span class="status"><span class="code s201">201</span>Order placed</span>
+        <span class="status"><span class="code s400">400</span>Risk limit breach</span>
+        <span class="status"><span class="code s503">503</span>MT5 circuit breaker open</span>
+      </div>
+      <pre><span class="hl-comment"># 201 response</span>
+{
+  <span class="hl-key">"trade_id"</span>:    <span class="hl-str">"trd_9f3a12c7"</span>,
+  <span class="hl-key">"mt5_ticket"</span>:  <span class="hl-num">12345679</span>,
+  <span class="hl-key">"status"</span>:      <span class="hl-str">"open"</span>,
+  <span class="hl-key">"open_price"</span>:  <span class="hl-num">2341.50</span>,
+  <span class="hl-key">"open_at"</span>:     <span class="hl-str">"2026-06-09T09:10:00Z"</span>
+}</pre>
+    </div>
+  </div>
+
+  <div class="endpoint" id="trades-close">
+    <div class="endpoint-header">
+      <span class="method-badge POST">POST</span>
+      <h4>/api/trades/{trade_id}/close</h4>
+      <span class="auth-badge required">JWT required</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Close an open position at market price. Pass optional <code>partial_lot</code> to partially close.</p>
+      <pre>{
+  <span class="hl-key">"partial_lot"</span>: <span class="hl-num">0.05</span>  <span class="hl-comment">// optional — omit to close full position</span>
+}</pre>
+    </div>
+  </div>
+
+  <div class="endpoint" id="positions">
+    <div class="endpoint-header">
+      <span class="method-badge GET">GET</span>
+      <h4>/api/trades/positions</h4>
+      <span class="auth-badge required">JWT required</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">All open positions with unrealised P&amp;L from MT5. Fetched live from MT5 on each call.</p>
+      <pre>{
+  <span class="hl-key">"positions"</span>: [
+    {
+      <span class="hl-key">"trade_id"</span>:    <span class="hl-str">"trd_9f3a12c7"</span>,
+      <span class="hl-key">"symbol"</span>:      <span class="hl-str">"XAUUSD"</span>,
+      <span class="hl-key">"direction"</span>:   <span class="hl-str">"buy"</span>,
+      <span class="hl-key">"lot_size"</span>:    <span class="hl-num">0.10</span>,
+      <span class="hl-key">"open_price"</span>:  <span class="hl-num">2341.50</span>,
+      <span class="hl-key">"current_price"</span>:<span class="hl-num">2348.30</span>,
+      <span class="hl-key">"unrealised_pnl"</span>:<span class="hl-num">68.00</span>,
+      <span class="hl-key">"sl"</span>:          <span class="hl-num">2325.00</span>,
+      <span class="hl-key">"tp"</span>:          <span class="hl-num">2380.00</span>,
+      <span class="hl-key">"mt5_ticket"</span>:  <span class="hl-num">12345679</span>
+    }
+  ],
+  <span class="hl-key">"total_pnl"</span>: <span class="hl-num">68.00</span>
+}</pre>
+    </div>
+  </div>
+
+  <div class="endpoint" id="risk-state">
+    <div class="endpoint-header">
+      <span class="method-badge GET">GET</span>
+      <h4>/api/trades/risk</h4>
+      <span class="auth-badge required">JWT required</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Current risk state: daily loss consumed, open positions count, auto-trading status, circuit breaker state.</p>
+      <pre>{
+  <span class="hl-key">"date"</span>:              <span class="hl-str">"2026-06-09"</span>,
+  <span class="hl-key">"daily_loss_usd"</span>:    <span class="hl-num">-45.00</span>,
+  <span class="hl-key">"daily_loss_cap_usd"</span>:<span class="hl-num">200.00</span>,
+  <span class="hl-key">"loss_pct_used"</span>:     <span class="hl-num">22.5</span>,
+  <span class="hl-key">"open_positions"</span>:    <span class="hl-num">1</span>,
+  <span class="hl-key">"max_positions"</span>:     <span class="hl-num">5</span>,
+  <span class="hl-key">"auto_trading"</span>:      <span class="hl-bool">true</span>,
+  <span class="hl-key">"circuit_breaker"</span>:   <span class="hl-str">"CLOSED"</span>,
+  <span class="hl-key">"mt5_connected"</span>:     <span class="hl-bool">true</span>
+}</pre>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       STRATEGIES
+  ════════════════════════════════════════════════════════════ -->
+  <h2 id="strategies">Strategies</h2>
+
+  <div class="endpoint" id="strategies-list">
+    <div class="endpoint-header">
+      <span class="method-badge GET">GET</span>
+      <h4>/api/strategies</h4>
+      <span class="auth-badge required">JWT required</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">List all YAML strategy configs from the <code>backend/strategies/</code> directory.</p>
+      <pre>{
+  <span class="hl-key">"strategies"</span>: [
+    { <span class="hl-key">"name"</span>: <span class="hl-str">"ema_macd_xauusd"</span>, <span class="hl-key">"symbol"</span>: <span class="hl-str">"XAUUSD"</span>, <span class="hl-key">"timeframe"</span>: <span class="hl-str">"H1"</span>, <span class="hl-key">"enabled"</span>: <span class="hl-bool">true</span> },
+    { <span class="hl-key">"name"</span>: <span class="hl-str">"smc_h1_eurusd"</span>,  <span class="hl-key">"symbol"</span>: <span class="hl-str">"EURUSD"</span>, <span class="hl-key">"timeframe"</span>: <span class="hl-str">"H1"</span>, <span class="hl-key">"enabled"</span>: <span class="hl-bool">false</span> }
+  ]
+}</pre>
+    </div>
+  </div>
+
+  <div class="endpoint" id="strategies-get">
+    <div class="endpoint-header">
+      <span class="method-badge GET">GET</span>
+      <h4>/api/strategies/{name}</h4>
+      <span class="auth-badge required">JWT required</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Get full YAML strategy config as a structured JSON object.</p>
+    </div>
+  </div>
+
+  <div class="endpoint" id="strategies-run">
+    <div class="endpoint-header">
+      <span class="method-badge POST">POST</span>
+      <h4>/api/strategies/{name}/evaluate</h4>
+      <span class="auth-badge required">JWT required</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Run strategy evaluation on the latest market data and return whether entry conditions are met. Does NOT place any order — evaluation only.</p>
+      <pre><span class="hl-comment"># Response</span>
+{
+  <span class="hl-key">"strategy"</span>:     <span class="hl-str">"ema_macd_xauusd"</span>,
+  <span class="hl-key">"symbol"</span>:       <span class="hl-str">"XAUUSD"</span>,
+  <span class="hl-key">"evaluated_at"</span>: <span class="hl-str">"2026-06-09T09:10:00Z"</span>,
+  <span class="hl-key">"entry_signal"</span>: <span class="hl-bool">true</span>,
+  <span class="hl-key">"conditions"</span>: [
+    { <span class="hl-key">"type"</span>: <span class="hl-str">"ema_cross"</span>,    <span class="hl-key">"met"</span>: <span class="hl-bool">true</span>,  <span class="hl-key">"detail"</span>: <span class="hl-str">"EMA20 above EMA50"</span> },
+    { <span class="hl-key">"type"</span>: <span class="hl-str">"macd_signal"</span>,  <span class="hl-key">"met"</span>: <span class="hl-bool">true</span>,  <span class="hl-key">"detail"</span>: <span class="hl-str">"bullish crossover"</span> },
+    { <span class="hl-key">"type"</span>: <span class="hl-str">"fib_zone"</span>,     <span class="hl-key">"met"</span>: <span class="hl-bool">false</span>, <span class="hl-key">"detail"</span>: <span class="hl-str">"price outside 38.2-61.8"</span> }
+  ],
+  <span class="hl-key">"suggested_order"</span>: {
+    <span class="hl-key">"direction"</span>: <span class="hl-str">"buy"</span>,
+    <span class="hl-key">"lot_size"</span>:  <span class="hl-num">0.10</span>,
+    <span class="hl-key">"sl"</span>:        <span class="hl-num">2325.00</span>,
+    <span class="hl-key">"tp"</span>:        <span class="hl-num">2380.00</span>
+  }
+}</pre>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       AI CO-PILOT
+  ════════════════════════════════════════════════════════════ -->
+  <h2 id="ai-copilot">AI Co-Pilot</h2>
+  <p>Powered by Anthropic claude-opus-4-8. Rate-limited to 10 requests/minute.</p>
+
+  <div class="endpoint" id="ai-chat">
+    <div class="endpoint-header">
+      <span class="method-badge POST">POST</span>
+      <h4>/api/ai/chat</h4>
+      <span class="auth-badge required">JWT required</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Send a message to the Claude AI co-pilot. Returns a streaming SSE response. Claude has access to current market state (injected as system context).</p>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this,'ai-req')">Request</button>
+        <button class="tab-btn" onclick="switchTab(this,'ai-stream')">SSE Stream</button>
+      </div>
+      <div class="tab-pane active" id="ai-req">
+        <pre>{
+  <span class="hl-key">"message"</span>:  <span class="hl-str">"Analyse XAUUSD H1 — is now a good time to buy?"</span>,
+  <span class="hl-key">"history"</span>:  [
+    { <span class="hl-key">"role"</span>: <span class="hl-str">"user"</span>,      <span class="hl-key">"content"</span>: <span class="hl-str">"What's the EMA trend?"</span> },
+    { <span class="hl-key">"role"</span>: <span class="hl-str">"assistant"</span>, <span class="hl-key">"content"</span>: <span class="hl-str">"EMA20 is above EMA50 indicating bullish..."</span> }
+  ],
+  <span class="hl-key">"context"</span>: {
+    <span class="hl-key">"symbol"</span>:    <span class="hl-str">"XAUUSD"</span>,
+    <span class="hl-key">"timeframe"</span>: <span class="hl-str">"H1"</span>
+  }
+}</pre>
+      </div>
+      <div class="tab-pane" id="ai-stream">
+        <p style="font-size:12px;color:var(--muted);margin-bottom:8px">Response: <code>Content-Type: text/event-stream</code></p>
+        <pre><span class="hl-comment"># Server-Sent Events stream</span>
+data: <span class="hl-str">{"type":"content","delta":"Based on current"}</span>
+
+data: <span class="hl-str">{"type":"content","delta":" H1 analysis, EMA20"}</span>
+
+data: <span class="hl-str">{"type":"content","delta":" is crossing above EMA50..."}</span>
+
+data: <span class="hl-str">{"type":"done","full_response":"Based on current H1 analysis..."}</span>
+
+<span class="hl-comment"># JavaScript client example</span>
+const es = new EventSource('/api/ai/chat', { method: 'POST' });
+<span class="hl-comment">// Or use fetch with ReadableStream for POST</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="endpoint" id="ai-report">
+    <div class="endpoint-header">
+      <span class="method-badge GET">GET</span>
+      <h4>/api/ai/report</h4>
+      <span class="auth-badge required">JWT required</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Retrieve the latest daily market report generated by APScheduler at 07:00 UTC. Multi-timeframe analysis across all tracked symbols. Returns cached report (no new Claude call on each GET).</p>
+      <pre>{
+  <span class="hl-key">"generated_at"</span>: <span class="hl-str">"2026-06-09T07:00:03Z"</span>,
+  <span class="hl-key">"symbols"</span>: {
+    <span class="hl-key">"XAUUSD"</span>: {
+      <span class="hl-key">"bias"</span>:    <span class="hl-str">"bullish"</span>,
+      <span class="hl-key">"summary"</span>: <span class="hl-str">"Gold maintaining bullish structure above EMA200 at 2290..."</span>,
+      <span class="hl-key">"key_levels"</span>: [<span class="hl-num">2325.0</span>, <span class="hl-num">2310.0</span>, <span class="hl-num">2380.0</span>],
+      <span class="hl-key">"watch"</span>:   <span class="hl-str">"61.8% Fibonacci at 2342.36 is immediate resistance"</span>
+    }
+  }
+}</pre>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       HEALTH
+  ════════════════════════════════════════════════════════════ -->
+  <h2 id="system">System</h2>
+
+  <div class="endpoint" id="health">
+    <div class="endpoint-header">
+      <span class="method-badge GET">GET</span>
+      <h4>/health</h4>
+      <span class="auth-badge">public</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">System health check. Returns status of all dependencies. API key values are masked — never returned in plaintext.</p>
+      <pre>{
+  <span class="hl-key">"status"</span>:   <span class="hl-str">"healthy"</span>,
+  <span class="hl-key">"version"</span>:  <span class="hl-str">"0.1.0"</span>,
+  <span class="hl-key">"checks"</span>: {
+    <span class="hl-key">"database"</span>:  <span class="hl-str">"ok"</span>,
+    <span class="hl-key">"redis"</span>:     <span class="hl-str">"ok"</span>,
+    <span class="hl-key">"mt5"</span>:       <span class="hl-str">"connected"</span>,
+    <span class="hl-key">"anthropic"</span>: <span class="hl-str">"configured"</span>
+  },
+  <span class="hl-key">"trading_mode"</span>: <span class="hl-str">"demo"</span>
+}</pre>
+      <div class="alert alert-warn">
+        <strong>Note:</strong> <code>anthropic</code> shows <code>"configured"</code> or <code>"missing"</code> only — the actual API key is never returned. Same for MT5 credentials.
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       WEBSOCKET
+  ════════════════════════════════════════════════════════════ -->
+  <h2 id="websocket">WebSocket</h2>
+  <p>Connect to <code>ws://localhost:8000/ws?token=&lt;jwt&gt;</code> for real-time updates.
+     The JWT is passed as a query parameter (headers not supported in browser WebSocket API).
+     The server sends events on every tick and candle close.</p>
+
+  <div class="endpoint" id="ws-connect">
+    <div class="endpoint-header">
+      <span class="method-badge WS">WS</span>
+      <h4>ws://localhost:8000/ws</h4>
+      <span class="auth-badge required">JWT via query param</span>
+    </div>
+    <div class="endpoint-body">
+      <table>
+        <tr><th>Param</th><th>Type</th><th></th><th>Description</th></tr>
+        <tr><td>token</td><td>string</td><td><span class="req">required</span></td><td>JWT access token from <code>/auth/token</code></td></tr>
+        <tr><td>symbols</td><td>string</td><td><span class="opt">optional</span></td><td>Comma-separated symbols to subscribe. Default: all</td></tr>
+      </table>
+      <pre><span class="hl-comment">// JavaScript connection example</span>
+const ws = new WebSocket(
+  `ws://localhost:8000/ws?token=${jwtToken}&symbols=XAUUSD,EURUSD`
+);
+
+ws.onmessage = (evt) => {
+  const event = JSON.parse(evt.data);
+  switch (event.type) {
+    case <span class="hl-str">'tick'</span>:        handleTick(event); break;
+    case <span class="hl-str">'candle_close'</span>: handleCandle(event); break;
+    case <span class="hl-str">'signal'</span>:       handleSignal(event); break;
+    case <span class="hl-str">'position'</span>:     handlePosition(event); break;
+    case <span class="hl-str">'risk'</span>:         handleRisk(event); break;
+  }
+};</pre>
+    </div>
+  </div>
+
+  <div class="endpoint" id="ws-events">
+    <div class="endpoint-header">
+      <span class="method-badge WS">WS</span>
+      <h4>Event Payloads</h4>
+    </div>
+    <div class="endpoint-body">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this,'ws-tick')">tick</button>
+        <button class="tab-btn" onclick="switchTab(this,'ws-candle')">candle_close</button>
+        <button class="tab-btn" onclick="switchTab(this,'ws-signal')">signal</button>
+        <button class="tab-btn" onclick="switchTab(this,'ws-position')">position</button>
+        <button class="tab-btn" onclick="switchTab(this,'ws-risk')">risk</button>
+      </div>
+      <div class="tab-pane active" id="ws-tick">
+        <p style="font-size:12px;color:var(--muted);margin-bottom:8px">Fires on every MT5 tick (~200ms throttle per symbol)</p>
+        <pre>{
+  <span class="hl-key">"type"</span>:   <span class="hl-str">"tick"</span>,
+  <span class="hl-key">"symbol"</span>: <span class="hl-str">"XAUUSD"</span>,
+  <span class="hl-key">"bid"</span>:    <span class="hl-num">2341.10</span>,
+  <span class="hl-key">"ask"</span>:    <span class="hl-num">2341.40</span>,
+  <span class="hl-key">"ts"</span>:     <span class="hl-str">"2026-06-09T09:10:01.234Z"</span>
+}</pre>
+      </div>
+      <div class="tab-pane" id="ws-candle">
+        <p style="font-size:12px;color:var(--muted);margin-bottom:8px">Fires on each candle close across all tracked timeframes</p>
+        <pre>{
+  <span class="hl-key">"type"</span>:      <span class="hl-str">"candle_close"</span>,
+  <span class="hl-key">"symbol"</span>:    <span class="hl-str">"XAUUSD"</span>,
+  <span class="hl-key">"timeframe"</span>: <span class="hl-str">"H1"</span>,
+  <span class="hl-key">"candle"</span>: {
+    <span class="hl-key">"ts"</span>:     <span class="hl-str">"2026-06-09T09:00:00Z"</span>,
+    <span class="hl-key">"open"</span>:  <span class="hl-num">2338.10</span>,
+    <span class="hl-key">"high"</span>:  <span class="hl-num">2345.70</span>,
+    <span class="hl-key">"low"</span>:   <span class="hl-num">2334.50</span>,
+    <span class="hl-key">"close"</span>: <span class="hl-num">2341.20</span>,
+    <span class="hl-key">"volume"</span>:<span class="hl-num">12340</span>
+  }
+}</pre>
+      </div>
+      <div class="tab-pane" id="ws-signal">
+        <p style="font-size:12px;color:var(--muted);margin-bottom:8px">Fires when a new signal is created (from webhook or strategy engine)</p>
+        <pre>{
+  <span class="hl-key">"type"</span>:      <span class="hl-str">"signal"</span>,
+  <span class="hl-key">"signal_id"</span>: <span class="hl-str">"sig_9f3a12c7"</span>,
+  <span class="hl-key">"symbol"</span>:    <span class="hl-str">"XAUUSD"</span>,
+  <span class="hl-key">"action"</span>:    <span class="hl-str">"buy"</span>,
+  <span class="hl-key">"price"</span>:     <span class="hl-num">2341.50</span>,
+  <span class="hl-key">"source"</span>:    <span class="hl-str">"tradingview"</span>,
+  <span class="hl-key">"status"</span>:    <span class="hl-str">"pending"</span>,
+  <span class="hl-key">"ts"</span>:        <span class="hl-str">"2026-06-09T09:10:00Z"</span>
+}</pre>
+      </div>
+      <div class="tab-pane" id="ws-position">
+        <p style="font-size:12px;color:var(--muted);margin-bottom:8px">Fires when a position is opened, updated (SL/TP change), or closed</p>
+        <pre>{
+  <span class="hl-key">"type"</span>:     <span class="hl-str">"position"</span>,
+  <span class="hl-key">"event"</span>:    <span class="hl-str">"opened"</span>,
+  <span class="hl-key">"trade_id"</span>: <span class="hl-str">"trd_9f3a12c7"</span>,
+  <span class="hl-key">"symbol"</span>:   <span class="hl-str">"XAUUSD"</span>,
+  <span class="hl-key">"pnl_usd"</span>:  <span class="hl-num">0.00</span>,
+  <span class="hl-key">"status"</span>:   <span class="hl-str">"open"</span>
+}</pre>
+      </div>
+      <div class="tab-pane" id="ws-risk">
+        <p style="font-size:12px;color:var(--muted);margin-bottom:8px">Fires when risk state changes (daily loss threshold, circuit breaker state change)</p>
+        <pre>{
+  <span class="hl-key">"type"</span>:             <span class="hl-str">"risk"</span>,
+  <span class="hl-key">"event"</span>:            <span class="hl-str">"daily_loss_warning"</span>,
+  <span class="hl-key">"daily_loss_usd"</span>:   <span class="hl-num">-160.00</span>,
+  <span class="hl-key">"daily_loss_cap"</span>:   <span class="hl-num">200.00</span>,
+  <span class="hl-key">"pct_used"</span>:         <span class="hl-num">80.0</span>,
+  <span class="hl-key">"auto_trading"</span>:     <span class="hl-bool">true</span>,
+  <span class="hl-key">"circuit_breaker"</span>:  <span class="hl-str">"CLOSED"</span>
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       REFERENCE
+  ════════════════════════════════════════════════════════════ -->
+  <h2 id="error-codes">Error Codes</h2>
+  <p>All error responses follow RFC 7807 Problem Details format.</p>
+  <pre>{
+  <span class="hl-key">"type"</span>:    <span class="hl-str">"https://aitrading.local/errors/risk-limit-breach"</span>,
+  <span class="hl-key">"title"</span>:   <span class="hl-str">"Risk Limit Breach"</span>,
+  <span class="hl-key">"status"</span>:  <span class="hl-num">400</span>,
+  <span class="hl-key">"detail"</span>:  <span class="hl-str">"Order rejected: would exceed daily loss cap of $200"</span>,
+  <span class="hl-key">"code"</span>:    <span class="hl-str">"RISK_DAILY_CAP"</span>
+}</pre>
+  <table>
+    <tr><th>HTTP</th><th>Code</th><th>Meaning</th></tr>
+    <tr><td>400</td><td><code>RISK_DAILY_CAP</code></td><td>Order would breach daily loss cap</td></tr>
+    <tr><td>400</td><td><code>RISK_MAX_POSITIONS</code></td><td>Max open positions reached</td></tr>
+    <tr><td>400</td><td><code>RISK_LOT_TOO_LARGE</code></td><td>Lot size exceeds max lot limit</td></tr>
+    <tr><td>400</td><td><code>SIGNAL_ALREADY_EXECUTED</code></td><td>Cannot cancel executed signal</td></tr>
+    <tr><td>401</td><td><code>AUTH_INVALID</code></td><td>Wrong password or invalid JWT</td></tr>
+    <tr><td>401</td><td><code>WEBHOOK_INVALID_SIG</code></td><td>HMAC signature mismatch</td></tr>
+    <tr><td>401</td><td><code>TOKEN_EXPIRED</code></td><td>JWT has expired</td></tr>
+    <tr><td>403</td><td><code>FORBIDDEN</code></td><td>Valid token but insufficient permission</td></tr>
+    <tr><td>404</td><td><code>NOT_FOUND</code></td><td>Resource not found</td></tr>
+    <tr><td>422</td><td><code>VALIDATION_ERROR</code></td><td>Pydantic validation failure (field details included)</td></tr>
+    <tr><td>429</td><td><code>RATE_LIMITED</code></td><td>Too many requests — retry after <code>Retry-After</code> seconds</td></tr>
+    <tr><td>503</td><td><code>MT5_CIRCUIT_OPEN</code></td><td>MT5 circuit breaker open — auto-trading paused</td></tr>
+    <tr><td>503</td><td><code>MT5_DISCONNECTED</code></td><td>MT5 connection lost</td></tr>
+    <tr><td>500</td><td><code>INTERNAL_ERROR</code></td><td>Unexpected server error</td></tr>
+  </table>
+
+  <h2 id="rate-limits">Rate Limits</h2>
+  <p>Enforced by SlowAPI (per IP). Exceeding limits returns HTTP 429 with a <code>Retry-After</code> header.</p>
+  <table>
+    <tr><th>Endpoint Group</th><th>Limit</th><th>Window</th></tr>
+    <tr><td><code>/auth/*</code></td><td>10 requests</td><td>1 minute</td></tr>
+    <tr><td><code>/api/ai/*</code></td><td>10 requests</td><td>1 minute</td></tr>
+    <tr><td><code>/webhook/*</code></td><td>60 requests</td><td>1 minute</td></tr>
+    <tr><td>All other <code>/api/*</code></td><td>300 requests</td><td>1 minute</td></tr>
+  </table>
+
+  <h2 id="enums">Enums</h2>
+  <table>
+    <tr><th>Field</th><th>Values</th></tr>
+    <tr><td>timeframe</td><td><code>M1</code> <code>M5</code> <code>M15</code> <code>H1</code> <code>H4</code> <code>D1</code> <code>W1</code></td></tr>
+    <tr><td>action / direction</td><td><code>buy</code> <code>sell</code> <code>close</code></td></tr>
+    <tr><td>signal.status</td><td><code>pending</code> <code>executed</code> <code>rejected</code> <code>expired</code></td></tr>
+    <tr><td>signal.source</td><td><code>tradingview</code> <code>mt5</code> <code>manual</code> <code>strategy</code></td></tr>
+    <tr><td>trade.status</td><td><code>pending</code> <code>open</code> <code>closed</code> <code>cancelled</code></td></tr>
+    <tr><td>circuit_breaker</td><td><code>CLOSED</code> <code>OPEN</code> <code>HALF_OPEN</code></td></tr>
+    <tr><td>risk.event</td><td><code>daily_loss_warning</code> <code>daily_loss_cap_hit</code> <code>circuit_breaker_opened</code> <code>circuit_breaker_closed</code></td></tr>
+    <tr><td>position.event</td><td><code>opened</code> <code>updated</code> <code>closed</code> <code>sl_hit</code> <code>tp_hit</code></td></tr>
+    <tr><td>macd_signal</td><td><code>bullish_cross</code> <code>bearish_cross</code> <code>bullish</code> <code>bearish</code> <code>neutral</code></td></tr>
+    <tr><td>ema_trend</td><td><code>bullish</code> <code>bearish</code> <code>mixed</code></td></tr>
+    <tr><td>smc type</td><td><code>bullish</code> <code>bearish</code></td></tr>
+    <tr><td>bos_choch type</td><td><code>BOS</code> <code>ChoCH</code></td></tr>
+    <tr><td>liquidity type</td><td><code>BSL</code> (buy-side) <code>SSL</code> (sell-side)</td></tr>
+  </table>
+
+</main>
+
+<script>
+function switchTab(btn, targetId) {
+  const body = btn.closest('.endpoint-body');
+  body.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  body.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(targetId).classList.add('active');
+}
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.querySelector('.theme-btn').textContent = isDark ? '🌙 Dark' : '☀ Light';
+}
+// Sidebar highlight on scroll
+const anchors = [...document.querySelectorAll('[id]')].map(el => el.id);
+const navLinks = [...document.querySelectorAll('nav a')];
+window.addEventListener('scroll', () => {
+  const y = window.scrollY + 80;
+  let active = '';
+  document.querySelectorAll('[id]').forEach(el => {
+    if (el.offsetTop <= y) active = el.id;
+  });
+  navLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + active);
+  });
+}, { passive: true });
+</script>
+</body>
+</html>
