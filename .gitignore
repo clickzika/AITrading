@@ -1,0 +1,69 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+venv/
+.venv/
+env/
+.env/
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+
+# MT5
+*.ex5
+*.set
+
+# Node / React
+node_modules/
+dist/
+build/
+.next/
+.nuxt/
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite
+
+# Docker
+.docker/
+
+# Coverage
+coverage/
+.coverage
+htmlcov/
+.pytest_cache/
+
+# TimescaleDB backups
+*.dump
+*.sql.gz

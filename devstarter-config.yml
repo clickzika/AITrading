@@ -1,0 +1,98 @@
+# devstarter-config.yml — AITrading Project Configuration
+# Single source of truth for all project settings.
+# Secrets (API keys, tokens, MT5 credentials) go in .env — never here.
+
+project:
+  name: AITrading
+  description: "Automated algo-trading platform for XAUUSD, Forex, and Crypto with SMC + classical TA, MT5 auto-execution, TradingView webhooks, and Claude AI co-pilot"
+  version: "0.1.0"
+  status: active
+  type: app
+  language: python
+
+devstarter:
+  install_profile: standard
+
+vcs:
+  type: github
+  repo: clickzika/AITrading
+  branch_strategy: gitflow
+  main_branch: main
+  uat_branch: uat
+  dev_branch: develop
+  release_remote: origin
+  upstream_remote: ""
+  secondary_1: none
+  secondary_2: none
+  sync_branches: "main uat develop"
+  branch_protection:
+    main:    { require_pr: true, allow_force_push: false, allow_deletion: false }
+    uat:     { require_pr: true, allow_force_push: false, allow_deletion: false }
+    develop: { require_pr: false, allow_force_push: false, allow_deletion: false }
+
+pm:
+  type: github-issues
+
+ci:
+  type: github-actions
+
+secrets:
+  backend: env-file
+
+obsidian:
+  enabled: false
+  vault_path: ""
+  transport: git
+  sanitize: true
+  subdir: knowledge
+
+ai:
+  provider: claude
+  model: claude-sonnet-4-6
+
+team:
+  skill_level: intermediate
+  size: solo
+
+stack:
+  frontend: react
+  backend: python
+  database: postgresql
+  message_bus: redis
+  analysis: pandas-ta
+  charts: tradingview-lightweight-charts
+  execution: metatrader5
+  ai_sdk: anthropic
+  strategy_config: yaml
+
+model_management:
+  haiku:  claude-haiku-4-5-20251001
+  sonnet: claude-sonnet-4-6
+  opus:   claude-opus-4-8
+  command_tiers:
+    opus:
+      - devstarter-audit
+      - devstarter-hotfix
+      - devstarter-incident
+      - devstarter-migrate
+      - devstarter-consult
+    sonnet:
+      - devstarter-new
+      - devstarter-change
+      - devstarter-existing
+      - devstarter-release
+      - devstarter-sprint
+      - devstarter-document
+      - devstarter-onboard
+      - devstarter-handover
+      - devstarter-retro
+      - devstarter-dependency
+      - devstarter-rollback
+      - devstarter-monitor
+    haiku:
+      - devstarter-context
+      - devstarter-menu
+      - devstarter-export
+      - devstarter-import
+      - devstarter-env
+      - devstarter-secrets

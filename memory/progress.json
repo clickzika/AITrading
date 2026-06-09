@@ -1,0 +1,14 @@
+{
+  "workflow": "dev-starter",
+  "status": "in_progress",
+  "gate": 0,
+  "autopilot_mode": false,
+  "current_task": "Gate 0 — Project Setup",
+  "completed_tasks": [],
+  "next_task": "Gate 1 — Discovery documents",
+  "files_modified": ["devstarter-config.yml", "memory/progress.json"],
+  "tasks_this_session": 1,
+  "files_read_this_session": 8,
+  "last_checkpoint": "2026-06-09T00:00:00",
+  "notes": "Greenfield project. GitHub: clickzika/AITrading. VCS: GitHub. PM: GitHub Issues. Stack: Python + FastAPI + Redis + TimescaleDB + React."
+}
