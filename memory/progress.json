@@ -1,32 +1,46 @@
 {
   "workflow": "dev-starter",
   "status": "in_progress",
-  "gate": 2,
+  "gate": 3,
   "autopilot_mode": false,
-  "current_task": "Gate 2 — Architecture COMPLETE — awaiting approval",
-  "completed_gates": [0, 1, 2],
+  "current_task": "Gate 3 — Foundation COMPLETE — awaiting approval",
+  "completed_gates": [0, 1, 2, 3],
   "deliverables": {
     "gate_0": ["devstarter-config.yml", ".gitignore", ".env.example", "git init + initial commit"],
     "gate_1": ["CLAUDE.md", "docs/brd.html", "docs/srs.html"],
     "gate_2": [
-      "docs/index.html",
-      "docs/database-design.html",
-      "docs/api-reference.html",
-      "docs/security-design.html",
-      "docs/infrastructure-guide.html",
-      "docs/test-strategy.html",
-      "docs/project-plan.html",
-      "docs/prototype/index.html"
+      "docs/index.html", "docs/database-design.html", "docs/api-reference.html",
+      "docs/security-design.html", "docs/infrastructure-guide.html",
+      "docs/test-strategy.html", "docs/project-plan.html", "docs/prototype/index.html"
+    ],
+    "gate_3": [
+      "docker-compose.yml (TimescaleDB + Redis)",
+      "backend/ — FastAPI scaffold, /health, auth middleware, Alembic config",
+      "backend/strategies/ — 3 YAML strategy configs",
+      "backend/tests/unit/test_health.py",
+      "frontend/ — Vite + React 18 + TypeScript + Zustand + React Query",
+      "frontend/src/services/ — api.ts, auth.ts, websocket.ts",
+      "frontend/src/stores/tradingStore.ts",
+      ".github/workflows/ci.yml — backend + frontend CI",
+      "GitHub labels + milestones (3) + issues (45, #2-#46)"
     ]
   },
+  "github_issues": {
+    "total": 45,
+    "range": "#2-#46",
+    "milestones": {
+      "1": "v0.1 — Core Engine (Phase 1)",
+      "2": "v0.2 — Strategy + Auto-Trade (Phase 2)",
+      "3": "v1.0 — Dashboard + AI (Phase 3)"
+    }
+  },
   "next_gate": {
-    "gate": 3,
-    "name": "Foundation",
-    "deliverables": [
-      "docker-compose.yml (TimescaleDB + Redis with healthchecks)",
-      "backend/ scaffold — FastAPI app, /health endpoint, folder structure",
-      "frontend/ scaffold — Vite + React + TypeScript, Zustand, React Query",
-      "GitHub Issues + milestones created (Phase 1 epics)"
+    "gate": 4,
+    "name": "Feature Development",
+    "phases": [
+      "Phase 1: MT5 feed + OHLCV storage + TA engine + SMC (T01-T17)",
+      "Phase 2: Strategy engine + MT5 execution + risk manager (T18-T30)",
+      "Phase 3: FastAPI REST/WS + React dashboard + Claude AI (T31-T45)"
     ]
   },
   "project": {
