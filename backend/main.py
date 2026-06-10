@@ -10,6 +10,12 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
 from app.api.auth import router as auth_router
+from app.api.ai.router import router as ai_router
+from app.api.analysis.router import router as analysis_router
+from app.api.signals.router import router as signals_router
+from app.api.trades.router import router as trades_router
+from app.api.webhooks.tradingview import router as webhook_router
+from app.api.ws import router as ws_router
 from app.config import settings
 
 
@@ -43,6 +49,12 @@ app.add_middleware(
 
 # Routers
 app.include_router(auth_router)
+app.include_router(analysis_router, prefix="/api")
+app.include_router(signals_router, prefix="/api")
+app.include_router(trades_router, prefix="/api")
+app.include_router(webhook_router)
+app.include_router(ai_router, prefix="/api")
+app.include_router(ws_router)
 
 
 @app.get("/health", tags=["system"])

@@ -1,9 +1,13 @@
 {
   "workflow": "dev-starter",
   "status": "in_progress",
-  "gate": 3,
-  "autopilot_mode": false,
-  "current_task": "Gate 3 — Foundation COMPLETE — awaiting approval",
+  "gate": 4,
+  "autopilot_mode": true,
+  "autopilot_sprint": 1,
+  "autopilot_total_sprints": 3,
+  "autopilot_total_tasks": 45,
+  "autopilot_tasks_done": 0,
+  "current_task": "Gate 4 — Phase 1 — T01: MT5 connection manager",
   "completed_gates": [0, 1, 2, 3],
   "deliverables": {
     "gate_0": ["devstarter-config.yml", ".gitignore", ".env.example", "git init + initial commit"],
@@ -14,16 +18,10 @@
       "docs/test-strategy.html", "docs/project-plan.html", "docs/prototype/index.html"
     ],
     "gate_3": [
-      "docker-compose.yml (TimescaleDB + Redis)",
-      "backend/ — FastAPI scaffold, /health, auth middleware, Alembic config",
-      "backend/strategies/ — 3 YAML strategy configs",
-      "backend/tests/unit/test_health.py",
-      "frontend/ — Vite + React 18 + TypeScript + Zustand + React Query",
-      "frontend/src/services/ — api.ts, auth.ts, websocket.ts",
-      "frontend/src/stores/tradingStore.ts",
-      ".github/workflows/ci.yml — backend + frontend CI",
-      "GitHub labels + milestones (3) + issues (45, #2-#46)"
-    ]
+      "docker-compose.yml", "backend/ scaffold", "frontend/ scaffold",
+      ".github/workflows/ci.yml", "45 GitHub issues (#2-#46)"
+    ],
+    "gate_4": []
   },
   "github_issues": {
     "total": 45,
@@ -34,15 +32,6 @@
       "3": "v1.0 — Dashboard + AI (Phase 3)"
     }
   },
-  "next_gate": {
-    "gate": 4,
-    "name": "Feature Development",
-    "phases": [
-      "Phase 1: MT5 feed + OHLCV storage + TA engine + SMC (T01-T17)",
-      "Phase 2: Strategy engine + MT5 execution + risk manager (T18-T30)",
-      "Phase 3: FastAPI REST/WS + React dashboard + Claude AI (T31-T45)"
-    ]
-  },
   "project": {
     "name": "AITrading",
     "repo": "https://github.com/clickzika/AITrading.git",
@@ -50,5 +39,5 @@
     "symbols": ["XAUUSD", "EURUSD", "GBPUSD", "BTCUSD", "ETHUSD"]
   },
   "last_checkpoint": "2026-06-09",
-  "notes": "Greenfield project. GitHub: clickzika/AITrading. VCS: GitHub. PM: GitHub Issues. Stack: Python + FastAPI + Redis + TimescaleDB + React."
+  "notes": "Autopilot ON. Developing 45 tasks across 3 phases. Next human interaction: Gate 5 only."
 }
