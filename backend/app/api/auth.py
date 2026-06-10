@@ -2,14 +2,18 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from app.config import settings
 from app.middleware.auth import create_access_token, get_current_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+_limiter = Limiter(key_func=get_remote_address)
 
 
 @router.post("/token")
+@_limiter.limit("5/minute")
 async def login(request: Request, form: OAuth2PasswordRequestForm = Depends()) -> dict:
     if form.password != settings.trader_password:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid password")

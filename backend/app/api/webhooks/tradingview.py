@@ -85,9 +85,10 @@ async def tradingview_webhook(
     try:
         signal = TradingViewSignal(**payload)
     except Exception as exc:
+        log.debug("Webhook payload validation error: %s", exc)
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"Payload validation failed: {exc}",
+            detail="Payload validation failed",
         ) from exc
 
     log.info(

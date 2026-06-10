@@ -1,11 +1,11 @@
 {
   "workflow": "dev-starter",
-  "status": "gate_5_ready",
+  "status": "complete",
   "gate": 5,
   "autopilot_mode": false,
   "autopilot_total_tasks": 44,
   "autopilot_tasks_done": 44,
-  "completed_gates": [0, 1, 2, 3, 4],
+  "completed_gates": [0, 1, 2, 3, 4, 5],
   "deliverables": {
     "gate_0": ["devstarter-config.yml", ".gitignore", ".env.example", "git init + initial commit"],
     "gate_1": ["CLAUDE.md", "docs/brd.html", "docs/srs.html"],
@@ -35,12 +35,22 @@
       "T36-T39: React dashboard — PriceChart, PositionsPanel, TradeLog, App layout",
       "T43-T44: CopilotChat UI",
       "PR #47 merged to develop"
+    ],
+    "gate_5": [
+      "test_coverage_boost.py — 82 new tests (news, grid, hedge, zones, wick, candle patterns, order_manager, position_manager)",
+      "135 total tests, 63.84% coverage (≥60% target met)",
+      "Security fix: exception detail leak in webhook (tradingview.py:90)",
+      "Security fix: rate limiting applied to /auth/token (5/minute)",
+      "README.md with setup + deployment guide",
+      "CLAUDE.md progress tracker updated to Gate 5 complete"
     ]
   },
   "test_results": {
-    "unit_tests": 53,
-    "passing": 53,
+    "unit_tests": 135,
+    "passing": 135,
     "failing": 0,
+    "coverage_pct": 63.84,
+    "coverage_target": 60,
     "frontend_build": "131 modules, 0 errors"
   },
   "github_issues": {
@@ -60,5 +70,5 @@
     "symbols": ["XAUUSD", "EURUSD", "GBPUSD", "BTCUSD", "ETHUSD"]
   },
   "last_checkpoint": "2026-06-10",
-  "notes": "Gate 4 autopilot COMPLETE. All 44 tasks done, 53 unit tests green, frontend builds clean. Awaiting Gate 5 approval from user."
+  "notes": "ALL GATES COMPLETE. v1.0 ready. 135 tests green, 63.84% coverage. Next: deploy to production — set TRADING_MODE=live only after demo validation."
 }
