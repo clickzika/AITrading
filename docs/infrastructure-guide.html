@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infrastructure Guide — AITrading</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--bg-page:#f5f7fa;--bg-header:#fff;--bg-sidebar:#f0f2f5;--bg-content:#fff;--bg-card:#f8f9fb;--bg-hover:#e8ebf0;--accent:#e94560;--text:#1a1a2e;--text-dim:#5a6578;--text-muted:#8493a8;--border:#d8dde4;--s1:#3b82f6;--s2:#8b5cf6;--s3:#f59e0b;--s4:#10b981;--s5:#ef4444;--s6:#f97316;--s7:#06b6d4;--header-h:64px;--sidebar-w:280px;--code-bg:#f1f5f9;--shadow:0 1px 3px rgba(0,0,0,.06)}
+  [data-theme=dark]{--bg-page:#0f0f23;--bg-header:#1a1a2e;--bg-sidebar:#16213e;--bg-content:#1e1e3a;--bg-card:#252547;--bg-hover:#0f3460;--text:#eee;--text-dim:#94a3b8;--text-muted:#64748b;--border:#1e3a5f;--code-bg:#0d0d1a;--shadow:0 1px 3px rgba(0,0,0,.3)}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-page);color:var(--text);height:100vh;overflow:hidden}
+  .doc-header{position:fixed;top:0;left:0;right:0;height:var(--header-h);background:var(--bg-header);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 32px;z-index:100;box-shadow:var(--shadow)}
+  .dhl{display:flex;align-items:center;gap:16px}
+  .logo{width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
+  .dht-p{font-size:18px;font-weight:700}.dht-d{font-size:12px;color:var(--text-dim)}
+  .dhr{display:flex;align-items:center;gap:12px}
+  .meta{text-align:right;font-size:12px;color:var(--text-dim)}
+  .sbadge{padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600;text-transform:uppercase;background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)}
+  .tgl{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+  .tgl-t{width:44px;height:24px;background:#e2e6eb;border-radius:12px;position:relative;border:1px solid var(--border)}
+  [data-theme=dark] .tgl-t{background:#1e3a5f}
+  .tgl-k{width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:2px;left:3px;transition:transform .3s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+  [data-theme=dark] .tgl-k{transform:translateX(20px);background:var(--accent)}
+  .sidebar{position:fixed;top:var(--header-h);left:0;bottom:0;width:var(--sidebar-w);background:var(--bg-sidebar);border-right:1px solid var(--border);overflow-y:auto;padding:20px 0;z-index:50}
+  .stitle{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);padding:0 20px 12px;border-bottom:1px solid var(--border);margin-bottom:8px}
+  .toc{list-style:none}.toc a{display:flex;align-items:center;gap:10px;padding:8px 20px;color:var(--text-dim);text-decoration:none;font-size:13px;font-weight:500;border-left:3px solid transparent;transition:all .15s}
+  .toc a:hover,.toc a.active{background:var(--bg-hover);color:var(--text);border-left-color:var(--accent)}
+  .toc a.active{background:rgba(233,69,96,.1);color:var(--accent)}
+  .tnum{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+  .s1{background:#3b82f6}.s2{background:#8b5cf6}.s3{background:#f59e0b}.s4{background:#10b981}.s5{background:#ef4444}.s6{background:#f97316}.s7{background:#06b6d4}
+  .content{margin-left:var(--sidebar-w);margin-top:var(--header-h);height:calc(100vh - var(--header-h));overflow-y:auto;padding:40px 48px 80px;background:var(--bg-content)}
+  .content::-webkit-scrollbar{width:6px}.content::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px}
+  .sh{display:flex;align-items:center;gap:14px;margin:48px 0 20px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+  .sh:first-child{margin-top:0}
+  .snum{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;font-size:14px;font-weight:800;color:#fff;flex-shrink:0}
+  .stit{font-size:22px;font-weight:700;letter-spacing:-.3px}
+  h3{font-size:16px;font-weight:600;margin:28px 0 12px;border-left:3px solid var(--accent);padding-left:12px}
+  h4{font-size:14px;font-weight:600;color:var(--text-dim);margin:18px 0 8px}
+  p{color:var(--text-dim);margin-bottom:16px;font-size:14px;line-height:1.7}
+  table{width:100%;border-collapse:collapse;margin:16px 0 24px;font-size:13px;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+  thead th{background:var(--bg-sidebar);color:var(--text);font-weight:600;text-align:left;padding:12px 16px;font-size:12px;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--accent)}
+  tbody tr{border-bottom:1px solid var(--border)}
+  tbody tr:nth-child(even){background:rgba(0,0,0,.02)}
+  [data-theme=dark] tbody tr:nth-child(even){background:rgba(255,255,255,.02)}
+  tbody tr:hover{background:rgba(233,69,96,.04)}
+  td{padding:10px 16px;color:var(--text-dim);vertical-align:top}
+  pre{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:16px 20px;overflow-x:auto;margin:12px 0 20px;font-size:13px;line-height:1.5}
+  code{font-family:'JetBrains Mono','Consolas',monospace;font-size:13px}
+  :not(pre)>code{background:rgba(233,69,96,.08);color:#d63851;padding:2px 6px;border-radius:4px;font-size:12px}
+  [data-theme=dark] :not(pre)>code{color:#ff6b81}
+  ul,ol{margin:8px 0 16px 24px;color:var(--text-dim);font-size:14px}
+  li{margin-bottom:6px;line-height:1.6}
+  .card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin:16px 0 24px}
+  .crit{border-left:4px solid #ef4444;background:rgba(239,68,68,.05)}
+  .warn{border-left:4px solid #f59e0b;background:rgba(245,158,11,.05)}
+  .good{border-left:4px solid #10b981;background:rgba(16,185,129,.05)}
+  .step{display:flex;gap:16px;padding:14px 0;border-bottom:1px solid var(--border)}
+  .step:last-child{border-bottom:none}
+  .step-num{width:28px;height:28px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;margin-top:2px}
+  .step-body{flex:1}
+  .step-title{font-size:14px;font-weight:600;margin-bottom:4px}
+  .step-desc{font-size:13px;color:var(--text-dim)}
+  @media print{.doc-header{position:static}.sidebar{display:none}.content{margin-left:0;height:auto;overflow:visible;padding:20px}body{background:#fff;overflow:auto}.tgl{display:none}}
+</style>
+</head>
+<body>
+<header class="doc-header">
+  <div class="dhl">
+    <div class="logo">AT</div>
+    <div><div class="dht-p">AITrading</div><div class="dht-d">Infrastructure Guide</div></div>
+  </div>
+  <div class="dhr">
+    <div class="meta"><div>Version 1.0 · 2026-06-09</div></div>
+    <span class="sbadge">● Draft</span>
+    <div class="tgl" onclick="toggleTheme()"><span id="ti">☀</span><div class="tgl-t"><div class="tgl-k"></div></div></div>
+  </div>
+</header>
+<nav class="sidebar">
+  <div class="stitle">Contents</div>
+  <ul class="toc">
+    <li><a href="#s1" class="active"><span class="tnum s1">1</span> Architecture Map</a></li>
+    <li><a href="#s2"><span class="tnum s2">2</span> Prerequisites</a></li>
+    <li><a href="#s3"><span class="tnum s3">3</span> Docker Compose</a></li>
+    <li><a href="#s4"><span class="tnum s4">4</span> Backend Setup</a></li>
+    <li><a href="#s5"><span class="tnum s5">5</span> Frontend Setup</a></li>
+    <li><a href="#s6"><span class="tnum s6">6</span> MT5 Setup</a></li>
+    <li><a href="#s7"><span class="tnum s7">7</span> Start / Stop</a></li>
+  </ul>
+</nav>
+<main class="content">
+
+  <div class="sh" id="s1"><span class="snum s1">1</span><h2 class="stit">Architecture Map</h2></div>
+  <p>All services run on a single Windows 11 machine. Docker Desktop handles TimescaleDB and Redis. Python backend and React frontend run as Windows native processes.</p>
+  <table>
+    <thead><tr><th>Service</th><th>Runtime</th><th>Port</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>TimescaleDB</td><td>Docker container</td><td>5432</td><td>PostgreSQL 15 + TimescaleDB extension</td></tr>
+      <tr><td>Redis</td><td>Docker container</td><td>6379</td><td>Pub/sub message bus + cache. No persistence needed.</td></tr>
+      <tr><td>FastAPI backend</td><td>Windows Python (venv)</td><td>8000</td><td>Must run native — MetaTrader5 lib is Windows-only</td></tr>
+      <tr><td>React dashboard</td><td>Vite dev server</td><td>5173</td><td>Or nginx on port 80 for production build</td></tr>
+      <tr><td>MetaTrader5</td><td>Windows app</td><td>N/A</td><td>Must be running and logged in</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sh" id="s2"><span class="snum s2">2</span><h2 class="stit">Prerequisites</h2></div>
+  <table>
+    <thead><tr><th>Requirement</th><th>Version</th><th>Download</th></tr></thead>
+    <tbody>
+      <tr><td>Windows 11</td><td>22H2+</td><td>Pre-installed</td></tr>
+      <tr><td>Python</td><td>3.11+</td><td>python.org</td></tr>
+      <tr><td>Node.js</td><td>18+</td><td>nodejs.org</td></tr>
+      <tr><td>Docker Desktop for Windows</td><td>4.x</td><td>docker.com</td></tr>
+      <tr><td>MetaTrader5</td><td>Latest</td><td>From broker</td></tr>
+      <tr><td>Git</td><td>2.x</td><td>git-scm.com</td></tr>
+      <tr><td>TA-Lib C library</td><td>0.4</td><td>See install note below</td></tr>
+    </tbody>
+  </table>
+
+  <div class="card warn">
+    <p><strong>TA-Lib on Windows:</strong> Install the pre-compiled wheel. <code>pip install TA-Lib</code> will fail without the C library. Use: <code>pip install TA_Lib-0.4.28-cp311-cp311-win_amd64.whl</code> (download from unofficial wheels repo).</p>
+  </div>
+
+  <div class="sh" id="s3"><span class="snum s3">3</span><h2 class="stit">Docker Compose</h2></div>
+  <pre><code># docker-compose.yml
+version: '3.9'
+services:
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    container_name: aitrading_db
+    environment:
+      POSTGRES_DB: aitrading
+      POSTGRES_USER: aitrading
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - timescaledb_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aitrading"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: aitrading_redis
+    ports:
+      - "6379:6379"
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  timescaledb_data:</code></pre>
+
+  <h3>Docker Commands</h3>
+  <pre><code># Start DB + Redis
+docker compose up -d
+
+# Check health
+docker compose ps
+
+# View logs
+docker compose logs -f timescaledb
+docker compose logs -f redis
+
+# Stop
+docker compose down
+
+# Stop + remove data (DESTRUCTIVE)
+docker compose down -v</code></pre>
+
+  <div class="sh" id="s4"><span class="snum s4">4</span><h2 class="stit">Backend Setup</h2></div>
+  <h3>Initial Setup</h3>
+  <pre><code># Clone repo
+git clone https://github.com/clickzika/AITrading.git
+cd AITrading
+
+# Create Python venv
+python -m venv .venv
+.venv\Scripts\activate   # PowerShell: .venv\Scripts\Activate.ps1
+
+# Install dependencies
+pip install -r backend/requirements.txt
+
+# Install TA-Lib (Windows — use pre-compiled wheel)
+pip install TA_Lib-0.4.28-cp311-cp311-win_amd64.whl
+
+# Copy .env and fill in values
+copy .env.example .env
+notepad .env</code></pre>
+
+  <h3>Environment Variables (.env)</h3>
+  <pre><code># === Required ===
+ANTHROPIC_API_KEY=sk-ant-...
+MT5_LOGIN=12345678
+MT5_PASSWORD=your_mt5_password
+MT5_SERVER=YourBroker-Demo
+MT5_PATH=C:\Program Files\MetaTrader 5\terminal64.exe
+
+DATABASE_URL=postgresql+asyncpg://aitrading:YOUR_PW@localhost:5432/aitrading
+POSTGRES_PASSWORD=YOUR_PW
+REDIS_URL=redis://localhost:6379/0
+
+API_SECRET_KEY=generate-with-python-secrets-module-min-32-chars
+TRADINGVIEW_WEBHOOK_SECRET=another-random-secret-min-16-chars
+
+# === Trading Safety ===
+TRADING_MODE=demo              # demo | live — MUST be "live" for real trading
+MAX_DAILY_LOSS_USD=200
+MAX_OPEN_POSITIONS=5
+MAX_LOT_SIZE=1.0
+DEFAULT_LOT_SIZE=0.01
+
+# === Optional ===
+CORS_ORIGINS=["http://localhost:5173"]
+JWT_EXPIRY_HOURS=24
+LOG_LEVEL=INFO</code></pre>
+
+  <h3>Run Migrations</h3>
+  <pre><code">cd backend
+alembic upgrade head</code></pre>
+
+  <h3>Start Backend</h3>
+  <pre><code">cd backend
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+# Production (no reload)
+uvicorn main:app --host 0.0.0.0 --port 8000 --workers 1</code></pre>
+
+  <h3>Verify Backend</h3>
+  <pre><code"># Health check
+curl http://localhost:8000/health
+
+# Expected response
+{
+  "status": "healthy",
+  "mt5": "connected",
+  "db": "connected",
+  "redis": "connected",
+  "trading_mode": "demo"
+}</code></pre>
+
+  <div class="sh" id="s5"><span class="snum s5">5</span><h2 class="stit">Frontend Setup</h2></div>
+  <pre><code">cd frontend
+npm install
+npm run dev         # dev server at http://localhost:5173
+
+# Production build
+npm run build
+# Serve dist/ with nginx or any static server</code></pre>
+
+  <h3>Vite Config</h3>
+  <pre><code">// frontend/vite.config.ts
+export default defineConfig({
+  server: {
+    proxy: {
+      '/api': 'http://localhost:8000',
+      '/ws': { target: 'ws://localhost:8000', ws: true }
+    }
+  }
+})</code></pre>
+
+  <div class="sh" id="s6"><span class="snum s6">6</span><h2 class="stit">MT5 Setup Checklist</h2></div>
+  <div class="card">
+    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Install MetaTrader5</div><div class="step-desc">Download from broker website. Login with demo account credentials.</div></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Enable Algorithmic Trading</div><div class="step-desc">MT5 → Tools → Options → Expert Advisors → ✓ Allow algorithmic trading</div></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Set MT5_PATH in .env</div><div class="step-desc">Full path to terminal64.exe, e.g. <code>C:\Program Files\MetaTrader 5\terminal64.exe</code></div></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Keep MT5 running</div><div class="step-desc">MetaTrader5 Python lib connects to the running terminal. MT5 must be open before starting backend.</div></div></div>
+    <div class="step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Verify connection</div><div class="step-desc">Check health endpoint: <code>curl localhost:8000/health</code> → <code>"mt5": "connected"</code></div></div></div>
+    <div class="step"><div class="step-num">6</div><div class="step-body"><div class="step-title">Test with demo account</div><div class="step-desc">Confirm <code>TRADING_MODE=demo</code> in .env. Run a strategy eval — watch demo account for test trade.</div></div></div>
+  </div>
+
+  <div class="sh" id="s7"><span class="snum s7">7</span><h2 class="stit">Start / Stop Procedures</h2></div>
+  <h3>Full System Start (order matters)</h3>
+  <pre><code"># 1. Start Docker services (DB + Redis)
+docker compose up -d
+
+# 2. Open MetaTrader5 and log in
+
+# 3. Activate Python venv and start backend
+cd AITrading\backend
+.venv\Scripts\Activate.ps1
+uvicorn main:app --port 8000
+
+# 4. Start frontend
+cd ..\frontend
+npm run dev
+
+# 5. Open browser
+# http://localhost:5173</code></pre>
+
+  <h3>Graceful Shutdown</h3>
+  <pre><code"># Stop backend (Ctrl+C in terminal)
+# Stop frontend (Ctrl+C in terminal)
+# Stop Docker
+docker compose down
+# Close MetaTrader5 (optional — positions remain in broker)</code></pre>
+
+  <h3>Health Check URLs</h3>
+  <table>
+    <thead><tr><th>URL</th><th>Expected</th></tr></thead>
+    <tbody>
+      <tr><td><code>http://localhost:8000/health</code></td><td>JSON with mt5/db/redis status</td></tr>
+      <tr><td><code>http://localhost:8000/docs</code></td><td>FastAPI OpenAPI swagger UI</td></tr>
+      <tr><td><code>http://localhost:5173</code></td><td>React dashboard</td></tr>
+    </tbody>
+  </table>
+
+</main>
+<script>
+function toggleTheme(){var h=document.documentElement,d=h.getAttribute('data-theme')==='dark';if(d){h.removeAttribute('data-theme');localStorage.setItem('docportal-theme','light');document.getElementById('ti').innerHTML='&#9788;';}else{h.setAttribute('data-theme','dark');localStorage.setItem('docportal-theme','dark');document.getElementById('ti').innerHTML='&#9790;';}}
+(function(){var s=localStorage.getItem('docportal-theme');if(s==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('ti').innerHTML='&#9790;';}})();
+var secs=document.querySelectorAll('.sh[id]'),links=document.querySelectorAll('.toc a'),c=document.querySelector('.content');
+c.addEventListener('scroll',function(){var cur='';secs.forEach(function(s){if(c.scrollTop>=s.offsetTop-c.offsetTop-100)cur=s.id;});links.forEach(function(l){l.classList.remove('active');if(l.getAttribute('href')==='#'+cur)l.classList.add('active');});});
+links.forEach(function(l){l.addEventListener('click',function(e){e.preventDefault();var t=document.querySelector(l.getAttribute('href'));if(t)c.scrollTo({top:t.offsetTop-c.offsetTop-20,behavior:'smooth'});});});
+</script>
+</body>
+</html>

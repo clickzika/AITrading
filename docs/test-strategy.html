@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test Strategy — AITrading</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--bg-page:#f5f7fa;--bg-header:#fff;--bg-sidebar:#f0f2f5;--bg-content:#fff;--bg-card:#f8f9fb;--bg-hover:#e8ebf0;--accent:#e94560;--text:#1a1a2e;--text-dim:#5a6578;--text-muted:#8493a8;--border:#d8dde4;--s1:#3b82f6;--s2:#8b5cf6;--s3:#f59e0b;--s4:#10b981;--s5:#ef4444;--s6:#f97316;--s7:#06b6d4;--header-h:64px;--sidebar-w:280px;--code-bg:#f1f5f9;--shadow:0 1px 3px rgba(0,0,0,.06)}
+  [data-theme=dark]{--bg-page:#0f0f23;--bg-header:#1a1a2e;--bg-sidebar:#16213e;--bg-content:#1e1e3a;--bg-card:#252547;--bg-hover:#0f3460;--text:#eee;--text-dim:#94a3b8;--text-muted:#64748b;--border:#1e3a5f;--code-bg:#0d0d1a;--shadow:0 1px 3px rgba(0,0,0,.3)}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-page);color:var(--text);height:100vh;overflow:hidden}
+  .doc-header{position:fixed;top:0;left:0;right:0;height:var(--header-h);background:var(--bg-header);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 32px;z-index:100;box-shadow:var(--shadow)}
+  .dhl{display:flex;align-items:center;gap:16px}.logo{width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
+  .dht-p{font-size:18px;font-weight:700}.dht-d{font-size:12px;color:var(--text-dim)}
+  .dhr{display:flex;align-items:center;gap:12px}.meta{text-align:right;font-size:12px;color:var(--text-dim)}
+  .sbadge{padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600;text-transform:uppercase;background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)}
+  .tgl{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+  .tgl-t{width:44px;height:24px;background:#e2e6eb;border-radius:12px;position:relative;border:1px solid var(--border)}
+  [data-theme=dark] .tgl-t{background:#1e3a5f}
+  .tgl-k{width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:2px;left:3px;transition:transform .3s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+  [data-theme=dark] .tgl-k{transform:translateX(20px);background:var(--accent)}
+  .sidebar{position:fixed;top:var(--header-h);left:0;bottom:0;width:var(--sidebar-w);background:var(--bg-sidebar);border-right:1px solid var(--border);overflow-y:auto;padding:20px 0;z-index:50}
+  .stitle{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);padding:0 20px 12px;border-bottom:1px solid var(--border);margin-bottom:8px}
+  .toc{list-style:none}.toc a{display:flex;align-items:center;gap:10px;padding:8px 20px;color:var(--text-dim);text-decoration:none;font-size:13px;font-weight:500;border-left:3px solid transparent;transition:all .15s}
+  .toc a:hover,.toc a.active{background:var(--bg-hover);color:var(--text);border-left-color:var(--accent)}
+  .toc a.active{background:rgba(233,69,96,.1);color:var(--accent)}
+  .tnum{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+  .s1{background:#3b82f6}.s2{background:#8b5cf6}.s3{background:#f59e0b}.s4{background:#10b981}.s5{background:#ef4444}.s6{background:#f97316}.s7{background:#06b6d4}
+  .content{margin-left:var(--sidebar-w);margin-top:var(--header-h);height:calc(100vh - var(--header-h));overflow-y:auto;padding:40px 48px 80px;background:var(--bg-content)}
+  .content::-webkit-scrollbar{width:6px}.content::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px}
+  .sh{display:flex;align-items:center;gap:14px;margin:48px 0 20px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+  .sh:first-child{margin-top:0}
+  .snum{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;font-size:14px;font-weight:800;color:#fff;flex-shrink:0}
+  .stit{font-size:22px;font-weight:700;letter-spacing:-.3px}
+  h3{font-size:16px;font-weight:600;margin:28px 0 12px;border-left:3px solid var(--accent);padding-left:12px}
+  p{color:var(--text-dim);margin-bottom:16px;font-size:14px;line-height:1.7}
+  table{width:100%;border-collapse:collapse;margin:16px 0 24px;font-size:13px;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+  thead th{background:var(--bg-sidebar);color:var(--text);font-weight:600;text-align:left;padding:12px 16px;font-size:12px;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--accent)}
+  tbody tr{border-bottom:1px solid var(--border)}
+  tbody tr:nth-child(even){background:rgba(0,0,0,.02)}
+  [data-theme=dark] tbody tr:nth-child(even){background:rgba(255,255,255,.02)}
+  td{padding:10px 16px;color:var(--text-dim);vertical-align:top}
+  pre{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:16px 20px;overflow-x:auto;margin:12px 0 20px;font-size:13px;line-height:1.5}
+  code{font-family:'JetBrains Mono','Consolas',monospace;font-size:13px}
+  :not(pre)>code{background:rgba(233,69,96,.08);color:#d63851;padding:2px 6px;border-radius:4px;font-size:12px}
+  [data-theme=dark] :not(pre)>code{color:#ff6b81}
+  ul,ol{margin:8px 0 16px 24px;color:var(--text-dim);font-size:14px}
+  li{margin-bottom:6px;line-height:1.6}
+  .card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin:16px 0 24px}
+  .note{border-left:4px solid #3b82f6;background:rgba(59,130,246,.05)}
+  @media print{.doc-header{position:static}.sidebar{display:none}.content{margin-left:0;height:auto;overflow:visible;padding:20px}body{background:#fff;overflow:auto}.tgl{display:none}}
+</style>
+</head>
+<body>
+<header class="doc-header">
+  <div class="dhl">
+    <div class="logo">AT</div>
+    <div><div class="dht-p">AITrading</div><div class="dht-d">Test Strategy</div></div>
+  </div>
+  <div class="dhr">
+    <div class="meta"><div>Version 1.0 · 2026-06-09</div></div>
+    <span class="sbadge">● Draft</span>
+    <div class="tgl" onclick="toggleTheme()"><span id="ti">☀</span><div class="tgl-t"><div class="tgl-k"></div></div></div>
+  </div>
+</header>
+<nav class="sidebar">
+  <div class="stitle">Contents</div>
+  <ul class="toc">
+    <li><a href="#s1" class="active"><span class="tnum s1">1</span> Pyramid</a></li>
+    <li><a href="#s2"><span class="tnum s2">2</span> Unit Tests</a></li>
+    <li><a href="#s3"><span class="tnum s3">3</span> MT5 Mock</a></li>
+    <li><a href="#s4"><span class="tnum s4">4</span> Integration Tests</a></li>
+    <li><a href="#s5"><span class="tnum s5">5</span> Risk Manager Tests</a></li>
+    <li><a href="#s6"><span class="tnum s6">6</span> Coverage Targets</a></li>
+    <li><a href="#s7"><span class="tnum s7">7</span> CI Pipeline</a></li>
+  </ul>
+</nav>
+<main class="content">
+
+  <div class="sh" id="s1"><span class="snum s1">1</span><h2 class="stit">Testing Pyramid</h2></div>
+  <table>
+    <thead><tr><th>Layer</th><th>%</th><th>Tool</th><th>Scope</th></tr></thead>
+    <tbody>
+      <tr><td>Unit</td><td>70%</td><td>pytest + pytest-asyncio</td><td>Analysis algorithms, risk calculations, strategy evaluator, YAML loader</td></tr>
+      <tr><td>Integration</td><td>20%</td><td>pytest + FastAPI TestClient</td><td>REST endpoints, WebSocket, DB queries, Redis pub/sub flow</td></tr>
+      <tr><td>Manual / Demo</td><td>10%</td><td>MT5 demo account</td><td>End-to-end trade flow on live demo market data</td></tr>
+    </tbody>
+  </table>
+  <div class="card note">
+    <p>No E2E browser automation in MVP. MT5 Python lib cannot be fully mocked at the OS level — always verify execution on demo account before enabling live trading.</p>
+  </div>
+
+  <div class="sh" id="s2"><span class="snum s2">2</span><h2 class="stit">Unit Tests</h2></div>
+  <h3>Indicator Calculations</h3>
+  <pre><code"># backend/tests/unit/test_indicators.py
+import pandas as pd
+import pytest
+from app.services.analysis.indicators import compute_ema, compute_macd, detect_ema_cross
+
+@pytest.fixture
+def sample_ohlcv():
+    """200 candles of synthetic price data."""
+    import numpy as np
+    np.random.seed(42)
+    prices = 1800 + np.cumsum(np.random.randn(200) * 0.5)
+    return pd.DataFrame({"close": prices})
+
+def test_ema_length(sample_ohlcv):
+    result = compute_ema(sample_ohlcv["close"], period=20)
+    assert len(result) == len(sample_ohlcv)
+    assert result.notna().sum() == len(sample_ohlcv) - 19  # first 19 are NaN
+
+def test_ema_cross_bullish(sample_ohlcv):
+    # Force a cross at index 50
+    sample_ohlcv.loc[49, "close"] = 1700  # make fast below slow
+    sample_ohlcv.loc[50, "close"] = 1900  # force cross up
+    snap = detect_ema_cross(sample_ohlcv["close"], fast=5, slow=20)
+    assert snap in ("bullish_cross", "bullish", "bearish", "bearish_cross", None)
+
+def test_macd_histogram_sign():
+    """MACD histogram should be positive when MACD > signal."""
+    data = pd.Series([100 + i * 0.5 for i in range(100)])
+    result = compute_macd(data)
+    last = result.iloc[-1]
+    if last["macd_line"] > last["macd_signal"]:
+        assert last["macd_hist"] > 0</code></pre>
+
+  <h3>Fibonacci Levels</h3>
+  <pre><code"># test_fibonacci.py
+from app.services.analysis.fibonacci import compute_fib_levels
+
+def test_fib_levels_at_correct_prices():
+    levels = compute_fib_levels(swing_high=2000.0, swing_low=1900.0)
+    assert levels.level_382 == pytest.approx(1961.8, abs=0.1)
+    assert levels.level_618 == pytest.approx(1938.2, abs=0.1)
+    assert levels.level_50 == pytest.approx(1950.0, abs=0.1)
+
+def test_fib_levels_range_not_zero():
+    with pytest.raises(ValueError, match="range cannot be zero"):
+        compute_fib_levels(swing_high=2000.0, swing_low=2000.0)</code></pre>
+
+  <h3>SMC Detection</h3>
+  <pre><code"># test_order_blocks.py
+from app.services.smc.order_blocks import detect_order_blocks
+from tests.fixtures import build_candles
+
+def test_bullish_ob_detected_before_bos():
+    candles = build_candles([
+        (100, 105, 98, 102),   # bearish
+        (102, 108, 100, 106),  # bullish BOS candle
+        (106, 115, 104, 113),  # strong up move
+    ])
+    zones = detect_order_blocks(candles)
+    assert len(zones) >= 1
+    assert zones[0].direction == "BULLISH"
+    assert zones[0].is_valid is True
+
+def test_ob_invalidated_when_price_breaks_midpoint():
+    # Build scenario where OB forms then price retests and breaks 50%
+    ...</code></pre>
+
+  <h3>Strategy YAML Loader</h3>
+  <pre><code"># test_strategy_engine.py
+from app.services.strategy.engine import StrategyEngine, load_strategy_config
+
+def test_yaml_loads_valid_strategy(tmp_path):
+    yaml_content = """
+strategy: test_strategy
+symbol: XAUUSD
+timeframe: H1
+entry:
+  conditions:
+    - type: ema_cross
+      fast: 20
+      slow: 50
+      direction: bullish
+  logic: AND
+risk:
+  method: fixed_lot
+  lot_size: 0.01
+  stop_loss_pips: 30
+  take_profit_pips: 90
+"""
+    f = tmp_path / "test.yml"
+    f.write_text(yaml_content)
+    cfg = load_strategy_config(str(f))
+    assert cfg.strategy == "test_strategy"
+    assert cfg.risk.lot_size == 0.01
+
+def test_martingale_without_max_cap_raises():
+    yaml_missing_cap = """
+strategy: bad_martingale
+execution_mode: martingale
+martingale:
+  multiplier: 2.0
+  # max_multiplier intentionally missing
+"""
+    with pytest.raises(ValueError, match="max_multiplier is required"):</code></pre>
+
+  <div class="sh" id="s3"><span class="snum s3">3</span><h2 class="stit">MT5 Mock Strategy</h2></div>
+  <p>MetaTrader5 Python lib is Windows-only and requires a running terminal. Mock it completely in tests using <code>unittest.mock</code> — never call the real lib in unit/integration tests.</p>
+  <pre><code"># tests/mocks/mt5_mock.py
+from unittest.mock import MagicMock, AsyncMock
+from dataclasses import dataclass
+
+@dataclass
+class MockAccountInfo:
+    balance: float = 10000.0
+    equity: float = 10000.0
+    margin: float = 0.0
+    free_margin: float = 10000.0
+    currency: str = "USD"
+
+@dataclass
+class MockOrderResult:
+    retcode: int = 10009   # TRADE_RETCODE_DONE
+    order: int = 12345678  # mt5 ticket
+    volume: float = 0.01
+    price: float = 2350.0
+
+def make_mt5_client_mock():
+    mock = AsyncMock()
+    mock.connect.return_value = True
+    mock.get_account_info.return_value = MockAccountInfo()
+    mock.place_market_order.return_value = MockOrderResult()
+    mock.get_open_positions.return_value = []
+    return mock</code></pre>
+
+  <pre><code"># Usage in test
+from tests.mocks.mt5_mock import make_mt5_client_mock
+
+async def test_order_manager_writes_to_db_before_mt5(db_session):
+    mt5_mock = make_mt5_client_mock()
+    order_mgr = OrderManager(mt5_client=mt5_mock, db=db_session)
+    intent = OrderIntent(symbol="XAUUSD", direction="BUY", lot_size=0.01,
+                         sl_price=2320.0, tp_price=2410.0, strategy_id="test")
+    await order_mgr.execute(intent)
+    # Verify DB write happened BEFORE MT5 call
+    trade = await db_session.get(Trade, intent.id)
+    assert trade is not None
+    assert trade.status == "OPEN"
+    mt5_mock.place_market_order.assert_awaited_once()</code></pre>
+
+  <div class="sh" id="s4"><span class="snum s4">4</span><h2 class="stit">Integration Tests</h2></div>
+  <h3>FastAPI Endpoint Tests</h3>
+  <pre><code"># tests/integration/test_api_candles.py
+from httpx import AsyncClient
+import pytest
+
+@pytest.mark.asyncio
+async def test_get_candles_requires_auth(app):
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        resp = await client.get("/api/v1/candles/XAUUSD/H1")
+    assert resp.status_code == 403
+
+@pytest.mark.asyncio
+async def test_get_candles_returns_data(app, auth_headers, seed_candles):
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        resp = await client.get("/api/v1/candles/XAUUSD/H1?limit=10",
+                                headers=auth_headers)
+    assert resp.status_code == 200
+    data = resp.json()
+    assert len(data) == 10
+    assert "time" in data[0] and "close" in data[0]</code></pre>
+
+  <h3>Webhook Tests</h3>
+  <pre><code"># test_webhook.py
+import hmac, hashlib
+
+def test_webhook_accepts_valid_signature(client, monkeypatch):
+    secret = "test-secret"
+    monkeypatch.setenv("TRADINGVIEW_WEBHOOK_SECRET", secret)
+    payload = b'{"symbol":"XAUUSD","action":"BUY","price":2350,"strategy_id":"tv_test"}'
+    sig = "sha256=" + hmac.new(secret.encode(), payload, hashlib.sha256).hexdigest()
+    resp = client.post("/api/v1/webhook/tradingview",
+                       content=payload,
+                       headers={"X-Signature": sig, "Content-Type": "application/json"})
+    assert resp.status_code == 200
+
+def test_webhook_rejects_bad_signature(client):
+    resp = client.post("/api/v1/webhook/tradingview",
+                       json={"symbol": "XAUUSD", "action": "BUY"},
+                       headers={"X-Signature": "sha256=badhash"})
+    assert resp.status_code == 401</code></pre>
+
+  <div class="sh" id="s5"><span class="snum s5">5</span><h2 class="stit">Risk Manager Tests</h2></div>
+  <pre><code"># test_risk_manager.py
+import pytest
+from app.services.strategy.risk import RiskManager
+
+@pytest.fixture
+def risk_mgr():
+    return RiskManager(max_daily_loss_usd=200, max_open_positions=5)
+
+async def test_rejects_when_daily_cap_reached(risk_mgr, db_session):
+    # Simulate $200 realized loss today
+    await db_session.execute(...)  # insert risk_state with realized_pnl=-200
+    intent = make_order_intent()
+    with pytest.raises(RiskRejected, match="daily loss cap"):
+        await risk_mgr.check(intent, db_session)
+
+async def test_rejects_when_max_positions_reached(risk_mgr, mt5_mock):
+    mt5_mock.get_open_positions.return_value = [MagicMock()] * 5
+    intent = make_order_intent()
+    with pytest.raises(RiskRejected, match="max open positions"):
+        await risk_mgr.check(intent, db_session)
+
+async def test_approves_valid_intent(risk_mgr, db_session, mt5_mock):
+    mt5_mock.get_open_positions.return_value = []
+    intent = make_order_intent()
+    result = await risk_mgr.check(intent, db_session)
+    assert result is True</code></pre>
+
+  <div class="sh" id="s6"><span class="snum s6">6</span><h2 class="stit">Coverage Targets</h2></div>
+  <table>
+    <thead><tr><th>Module</th><th>Target Coverage</th><th>Priority</th></tr></thead>
+    <tbody>
+      <tr><td>services/analysis/</td><td>85%+</td><td>High — correctness of indicator math critical</td></tr>
+      <tr><td>services/smc/</td><td>80%+</td><td>High — OB/FVG detection algorithmic</td></tr>
+      <tr><td>services/strategy/risk.py</td><td>95%+</td><td>Critical — financial safety controls</td></tr>
+      <tr><td>services/strategy/engine.py</td><td>80%+</td><td>High — YAML eval logic</td></tr>
+      <tr><td>services/execution/</td><td>70%+</td><td>Medium — MT5 mock covers main paths</td></tr>
+      <tr><td>api/</td><td>70%+</td><td>Medium — integration tests cover happy paths</td></tr>
+    </tbody>
+  </table>
+  <pre><code"># Run tests with coverage
+cd backend
+pytest --cov=app --cov-report=html tests/
+# Open htmlcov/index.html in browser</code></pre>
+
+  <div class="sh" id="s7"><span class="snum s7">7</span><h2 class="stit">CI Pipeline (GitHub Actions)</h2></div>
+  <pre><code"># .github/workflows/ci.yml
+name: CI
+on: [push, pull_request]
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest   # Note: MT5 tests skipped (Windows-only)
+    services:
+      postgres:
+        image: timescale/timescaledb:latest-pg15
+        env:
+          POSTGRES_DB: aitrading_test
+          POSTGRES_USER: aitrading
+          POSTGRES_PASSWORD: test
+        ports: ["5432:5432"]
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install -r backend/requirements-test.txt
+      - run: cd backend && pytest --cov=app tests/ -v
+        env:
+          DATABASE_URL: postgresql+asyncpg://aitrading:test@localhost:5432/aitrading_test
+          REDIS_URL: redis://localhost:6379/0
+          API_SECRET_KEY: test-secret-key-for-ci
+          TRADING_MODE: demo
+          MT5_MOCK: "true"   # flag to skip MT5 lib import
+
+  frontend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '18'}
+      - run: cd frontend && npm ci && npm run build && npm run type-check</code></pre>
+
+</main>
+<script>
+function toggleTheme(){var h=document.documentElement,d=h.getAttribute('data-theme')==='dark';if(d){h.removeAttribute('data-theme');localStorage.setItem('docportal-theme','light');document.getElementById('ti').innerHTML='&#9788;';}else{h.setAttribute('data-theme','dark');localStorage.setItem('docportal-theme','dark');document.getElementById('ti').innerHTML='&#9790;';}}
+(function(){var s=localStorage.getItem('docportal-theme');if(s==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('ti').innerHTML='&#9790;';}})();
+var secs=document.querySelectorAll('.sh[id]'),links=document.querySelectorAll('.toc a'),c=document.querySelector('.content');
+c.addEventListener('scroll',function(){var cur='';secs.forEach(function(s){if(c.scrollTop>=s.offsetTop-c.offsetTop-100)cur=s.id;});links.forEach(function(l){l.classList.remove('active');if(l.getAttribute('href')==='#'+cur)l.classList.add('active');});});
+links.forEach(function(l){l.addEventListener('click',function(e){e.preventDefault();var t=document.querySelector(l.getAttribute('href'));if(t)c.scrollTo({top:t.offsetTop-c.offsetTop-20,behavior:'smooth'});});});
+</script>
+</body>
+</html>

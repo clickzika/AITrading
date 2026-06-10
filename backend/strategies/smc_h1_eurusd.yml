@@ -1,0 +1,33 @@
+strategy: smc_h1_eurusd
+symbol: EURUSD
+timeframe: H1
+description: "SMC — Order Block + FVG entry on EURUSD H1"
+
+entry:
+  conditions:
+    - type: order_block
+      direction: bullish
+      mitigated: false
+    - type: fvg
+      direction: bullish
+      filled: false
+    - type: bos
+      direction: bullish
+  logic: AND
+
+exit:
+  conditions:
+    - type: fib_zone
+      levels: [161.8]
+      zone: resistance
+  logic: OR
+
+risk:
+  method: fixed_fractional
+  risk_pct: 1.0
+  stop_loss_pips: 25
+  take_profit_pips: 75
+  trailing_stop: false
+  max_daily_loss_usd: 200
+  max_open_positions: 3
+  max_lot_size: 1.0
