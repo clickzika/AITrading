@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Software Requirements Specification — AITrading</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg-page:#f5f7fa;--bg-header:#ffffff;--bg-sidebar:#f0f2f5;--bg-content:#ffffff;
+    --bg-card:#f8f9fb;--bg-hover:#e8ebf0;--accent:#e94560;--accent-light:#d63851;
+    --text:#1a1a2e;--text-dim:#5a6578;--text-muted:#8493a8;--border:#d8dde4;--border-light:#e2e7ed;
+    --status-draft:#f59e0b;--status-review:#3b82f6;--status-approved:#10b981;
+    --section-1:#3b82f6;--section-2:#8b5cf6;--section-3:#f59e0b;--section-4:#10b981;
+    --section-5:#ef4444;--section-6:#f97316;--section-7:#06b6d4;--section-8:#ec4899;
+    --section-9:#6366f1;--section-10:#14b8a6;
+    --header-h:64px;--sidebar-w:280px;
+    --code-bg:#f1f5f9;--code-inline-bg:rgba(233,69,96,0.08);--code-inline-color:#d63851;
+    --table-even-bg:rgba(0,0,0,0.02);--table-hover-bg:rgba(233,69,96,0.04);
+    --shadow:0 1px 3px rgba(0,0,0,0.06);--toggle-bg:#e2e6eb;--toggle-knob:#ffffff;
+    --mermaid-bg:rgba(0,0,0,0.02);
+  }
+  [data-theme="dark"] {
+    --bg-page:#0f0f23;--bg-header:#1a1a2e;--bg-sidebar:#16213e;--bg-content:#1e1e3a;
+    --bg-card:#252547;--bg-hover:#0f3460;--accent:#e94560;--accent-light:#ff6b81;
+    --text:#eeeeee;--text-dim:#94a3b8;--text-muted:#64748b;--border:#1e3a5f;--border-light:#2d4a6f;
+    --code-bg:#0d0d1a;--code-inline-bg:rgba(233,69,96,0.1);--code-inline-color:#ff6b81;
+    --table-even-bg:rgba(255,255,255,0.02);--table-hover-bg:rgba(233,69,96,0.05);
+    --shadow:0 1px 3px rgba(0,0,0,0.3);--toggle-bg:#1e3a5f;--toggle-knob:#e94560;--mermaid-bg:rgba(255,255,255,0.03);
+  }
+  body { font-family:'Inter',system-ui,-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg-page);color:var(--text);line-height:1.6;height:100vh;overflow:hidden;transition:background 0.3s,color 0.3s; }
+  .doc-header { position:fixed;top:0;left:0;right:0;height:var(--header-h);background:var(--bg-header);border-bottom:1px solid var(--border);box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;padding:0 32px;z-index:100;transition:background 0.3s,border-color 0.3s; }
+  .doc-header-left { display:flex;align-items:center;gap:16px; }
+  .doc-header-logo { width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff; }
+  .doc-header-title { display:flex;flex-direction:column; }
+  .doc-header-project { font-size:18px;font-weight:700;letter-spacing:-0.3px;color:var(--text); }
+  .doc-header-docname { font-size:12px;color:var(--text-dim);font-weight:500; }
+  .doc-header-right { display:flex;align-items:center;gap:16px; }
+  .doc-header-meta { text-align:right;font-size:12px;color:var(--text-dim); }
+  .doc-status-badge { display:inline-flex;align-items:center;gap:6px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px; }
+  .doc-status-badge.draft { background:rgba(245,158,11,0.15);color:var(--status-draft);border:1px solid rgba(245,158,11,0.3); }
+  .theme-toggle { display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none; }
+  .theme-toggle-icon { font-size:14px;color:var(--text-dim); }
+  .theme-toggle-track { width:44px;height:24px;background:var(--toggle-bg);border-radius:12px;position:relative;transition:background 0.3s;border:1px solid var(--border); }
+  .theme-toggle-knob { width:18px;height:18px;background:var(--toggle-knob);border-radius:50%;position:absolute;top:2px;left:3px;transition:transform 0.3s,background 0.3s;box-shadow:0 1px 3px rgba(0,0,0,0.2); }
+  [data-theme="dark"] .theme-toggle-knob { transform:translateX(20px); }
+  .pdf-btn { display:flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;user-select:none;background:rgba(233,69,96,0.1);border:1px solid rgba(233,69,96,0.3);color:var(--accent);transition:all 0.2s; }
+  .pdf-btn:hover { background:rgba(233,69,96,0.2); }
+  .doc-sidebar { position:fixed;top:var(--header-h);left:0;bottom:0;width:var(--sidebar-w);background:var(--bg-sidebar);border-right:1px solid var(--border);overflow-y:auto;padding:20px 0;z-index:50;transition:background 0.3s,border-color 0.3s; }
+  .doc-sidebar::-webkit-scrollbar { width:4px; }
+  .doc-sidebar::-webkit-scrollbar-thumb { background:var(--border-light);border-radius:4px; }
+  .doc-sidebar-title { font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);padding:0 20px 12px;border-bottom:1px solid var(--border);margin-bottom:8px; }
+  .toc-list { list-style:none;padding:0; }
+  .toc-item { display:block; }
+  .toc-link { display:flex;align-items:center;gap:10px;padding:8px 20px;color:var(--text-dim);text-decoration:none;font-size:13px;font-weight:500;transition:all 0.15s ease;border-left:3px solid transparent; }
+  .toc-link:hover { background:var(--bg-hover);color:var(--text);border-left-color:var(--accent); }
+  .toc-link.active { background:rgba(233,69,96,0.1);color:var(--accent-light);border-left-color:var(--accent); }
+  .toc-number { display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;font-size:11px;font-weight:700;flex-shrink:0;color:#fff; }
+  .toc-number.s1{background:var(--section-1)}.toc-number.s2{background:var(--section-2)}.toc-number.s3{background:var(--section-3)}.toc-number.s4{background:var(--section-4)}.toc-number.s5{background:var(--section-5)}.toc-number.s6{background:var(--section-6)}.toc-number.s7{background:var(--section-7)}.toc-number.s8{background:var(--section-8)}.toc-number.s9{background:var(--section-9)}.toc-number.s10{background:var(--section-10)}
+  .doc-info-card { margin:16px 12px 0;padding:14px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;font-size:12px;transition:background 0.3s,border-color 0.3s; }
+  .doc-info-row { display:flex;justify-content:space-between;padding:4px 0;color:var(--text-dim); }
+  .doc-info-row span:first-child { color:var(--text-muted); }
+  .doc-content { margin-left:var(--sidebar-w);margin-top:var(--header-h);height:calc(100vh - var(--header-h));overflow-y:auto;padding:40px 48px 80px;background:var(--bg-content);transition:background 0.3s; }
+  .doc-content::-webkit-scrollbar { width:6px; }
+  .doc-content::-webkit-scrollbar-thumb { background:var(--border-light);border-radius:6px; }
+  .section-header { display:flex;align-items:center;gap:14px;margin:48px 0 20px;padding-bottom:12px;border-bottom:1px solid var(--border); }
+  .section-header:first-child { margin-top:0; }
+  .section-number { display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;font-size:14px;font-weight:800;color:#fff;flex-shrink:0; }
+  .section-number.s1{background:var(--section-1)}.section-number.s2{background:var(--section-2)}.section-number.s3{background:var(--section-3)}.section-number.s4{background:var(--section-4)}.section-number.s5{background:var(--section-5)}.section-number.s6{background:var(--section-6)}.section-number.s7{background:var(--section-7)}.section-number.s8{background:var(--section-8)}.section-number.s9{background:var(--section-9)}.section-number.s10{background:var(--section-10)}
+  .section-title { font-size:22px;font-weight:700;letter-spacing:-0.3px; }
+  h3 { font-size:16px;font-weight:600;color:var(--text);margin:28px 0 12px;border-left:3px solid var(--accent);padding-left:12px; }
+  h4 { font-size:14px;font-weight:600;color:var(--text-dim);margin:20px 0 8px; }
+  p { color:var(--text-dim);margin-bottom:16px;font-size:14px;line-height:1.7; }
+  table { width:100%;border-collapse:collapse;margin:16px 0 24px;font-size:13px;border-radius:8px;overflow:hidden;border:1px solid var(--border); }
+  thead th { background:var(--bg-sidebar);color:var(--text);font-weight:600;text-align:left;padding:12px 16px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid var(--accent);transition:background 0.3s; }
+  tbody tr { border-bottom:1px solid var(--border);transition:background 0.1s ease; }
+  tbody tr:nth-child(even) { background:var(--table-even-bg); }
+  tbody tr:hover { background:var(--table-hover-bg); }
+  td { padding:10px 16px;color:var(--text-dim);vertical-align:top; }
+  pre { background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:16px 20px;overflow-x:auto;margin:12px 0 20px;font-size:13px;line-height:1.5;transition:background 0.3s,border-color 0.3s; }
+  code { font-family:'JetBrains Mono','Fira Code','Consolas',monospace;font-size:13px; }
+  :not(pre) > code { background:var(--code-inline-bg);color:var(--code-inline-color);padding:2px 6px;border-radius:4px;font-size:12px; }
+  ul,ol { margin:8px 0 16px 24px;color:var(--text-dim);font-size:14px; }
+  li { margin-bottom:6px;line-height:1.6; }
+  .card { background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin:16px 0 24px;transition:background 0.3s,border-color 0.3s; }
+  .note { border-left:4px solid var(--section-1);background:rgba(59,130,246,0.05); }
+  .warning { border-left:4px solid var(--status-draft);background:rgba(245,158,11,0.05); }
+  .critical { border-left:4px solid var(--section-5);background:rgba(239,68,68,0.05); }
+  .badge { display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px; }
+  .badge-get{background:rgba(16,185,129,0.15);color:#10b981}.badge-post{background:rgba(59,130,246,0.15);color:#3b82f6}.badge-put{background:rgba(245,158,11,0.15);color:#f59e0b}.badge-del{background:rgba(239,68,68,0.15);color:#ef4444}
+  .badge-green{background:rgba(16,185,129,0.15);color:#10b981}.badge-blue{background:rgba(59,130,246,0.15);color:#3b82f6}.badge-purple{background:rgba(139,92,246,0.15);color:#8b5cf6}.badge-orange{background:rgba(249,115,22,0.15);color:#f97316}
+  .api-endpoint { display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin:6px 0;font-family:'JetBrains Mono','Consolas',monospace;font-size:13px; }
+  @media (max-width:768px) { .doc-sidebar{display:none;}.doc-content{margin-left:0;padding:24px 16px 60px;} }
+  @media print { .doc-header{position:static;border-bottom:2px solid #000;box-shadow:none;}.doc-sidebar{display:none;}.doc-content{margin-left:0;height:auto;overflow:visible;padding:20px;}body{background:#fff;color:#000;overflow:auto;}.section-header{border-bottom-color:#ccc;page-break-after:avoid;}table{border-color:#ccc;page-break-inside:avoid;}thead th{background:#f5f5f5;color:#000;border-bottom-color:#000;}tbody tr:nth-child(even){background:#f9f9f9;}td,p,li{color:#333;}h3{border-left-color:#000;page-break-after:avoid;}pre{background:#f5f5f5;border-color:#ccc;page-break-inside:avoid;}.card{background:#f9f9f9;border-color:#ccc;}.theme-toggle,.pdf-btn{display:none;} }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>var savedTheme=localStorage.getItem('docportal-theme');mermaid.initialize({theme:savedTheme==='dark'?'dark':'default',startOnLoad:true});</script>
+</head>
+<body>
+
+<header class="doc-header">
+  <div class="doc-header-left">
+    <div class="doc-header-logo">AT</div>
+    <div class="doc-header-title">
+      <div class="doc-header-project">AITrading</div>
+      <div class="doc-header-docname">Software Requirements Specification</div>
+    </div>
+  </div>
+  <div class="doc-header-right">
+    <div class="doc-header-meta">
+      <div>Version 1.0 · 2026-06-09</div>
+      <div>Author: clickzika</div>
+    </div>
+    <span class="doc-status-badge draft">● Draft</span>
+    <button class="pdf-btn" onclick="window.print()">&#128462; Export PDF</button>
+    <div class="theme-toggle" onclick="toggleTheme()">
+      <span class="theme-toggle-icon" id="themeIcon">&#9788;</span>
+      <div class="theme-toggle-track"><div class="theme-toggle-knob"></div></div>
+    </div>
+  </div>
+</header>
+
+<nav class="doc-sidebar">
+  <div class="doc-sidebar-title">Table of Contents</div>
+  <ul class="toc-list">
+    <li class="toc-item"><a href="#section-1" class="toc-link active"><span class="toc-number s1">1</span> System Overview</a></li>
+    <li class="toc-item"><a href="#section-2" class="toc-link"><span class="toc-number s2">2</span> Architecture</a></li>
+    <li class="toc-item"><a href="#section-3" class="toc-link"><span class="toc-number s3">3</span> Data Models</a></li>
+    <li class="toc-item"><a href="#section-4" class="toc-link"><span class="toc-number s4">4</span> API Specification</a></li>
+    <li class="toc-item"><a href="#section-5" class="toc-link"><span class="toc-number s5">5</span> Analysis Engine</a></li>
+    <li class="toc-item"><a href="#section-6" class="toc-link"><span class="toc-number s6">6</span> Strategy Engine</a></li>
+    <li class="toc-item"><a href="#section-7" class="toc-link"><span class="toc-number s7">7</span> Execution Engine</a></li>
+    <li class="toc-item"><a href="#section-8" class="toc-link"><span class="toc-number s8">8</span> Frontend Specification</a></li>
+    <li class="toc-item"><a href="#section-9" class="toc-link"><span class="toc-number s9">9</span> Security</a></li>
+    <li class="toc-item"><a href="#section-10" class="toc-link"><span class="toc-number s10">10</span> Tech Stack</a></li>
+  </ul>
+  <div class="doc-info-card">
+    <div class="doc-info-row"><span>Version</span><span>1.0</span></div>
+    <div class="doc-info-row"><span>Status</span><span>Draft</span></div>
+    <div class="doc-info-row"><span>Date</span><span>2026-06-09</span></div>
+    <div class="doc-info-row"><span>Author</span><span>clickzika</span></div>
+  </div>
+</nav>
+
+<main class="doc-content">
+
+  <!-- ═══ SECTION 1 — System Overview ═══ -->
+  <div class="section-header" id="section-1">
+    <span class="section-number s1">1</span>
+    <h2 class="section-title">System Overview</h2>
+  </div>
+
+  <h3>Purpose</h3>
+  <p>AITrading is a Windows-hosted automated trading system connecting MetaTrader5 broker execution to a configurable strategy engine backed by multi-indicator technical analysis. The system runs 24/5 during Forex market hours, evaluating YAML-defined strategies on candle close events and executing orders via MT5 with hard risk management enforcement.</p>
+
+  <h3>System Context Diagram</h3>
+  <div class="mermaid">
+C4Context
+  title AITrading System Context
+  Person(trader, "Trader", "Single user — configures strategies, monitors dashboard")
+  System(ait, "AITrading", "Algo trading platform: analysis + strategy + MT5 execution")
+  System_Ext(mt5, "MetaTrader5", "Broker terminal — price feed + order execution")
+  System_Ext(tv, "TradingView", "Pine Script alerts via webhook")
+  System_Ext(claude, "Anthropic Claude API", "AI co-pilot market analysis")
+  System_Ext(calendar, "Economic Calendar API", "News event data")
+  Rel(trader, ait, "Uses", "Browser dashboard + chat")
+  Rel(ait, mt5, "Reads prices, sends orders", "MT5 Python lib")
+  Rel(tv, ait, "Sends alerts", "HTTPS webhook POST")
+  Rel(ait, claude, "Sends analysis requests", "HTTPS REST API")
+  Rel(ait, calendar, "Reads news events", "HTTPS REST API")
+  </div>
+
+  <h3>Tech Stack Summary</h3>
+  <table>
+    <thead><tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>Backend API</td><td>Python 3.11 + FastAPI</td><td>REST API gateway, WebSocket server, event orchestration</td></tr>
+      <tr><td>Analysis</td><td>pandas + pandas-ta + TA-Lib</td><td>Indicator computation on OHLCV DataFrames</td></tr>
+      <tr><td>MT5 Bridge</td><td>MetaTrader5 Python lib</td><td>Price feed ingestion + order execution</td></tr>
+      <tr><td>Message Bus</td><td>Redis pub/sub</td><td>Decouple market data ingestion from strategy evaluation</td></tr>
+      <tr><td>Database</td><td>TimescaleDB (PostgreSQL)</td><td>OHLCV time-series + trade/position log</td></tr>
+      <tr><td>ORM</td><td>SQLAlchemy 2.0 async</td><td>Async DB access with Pydantic v2 schemas</td></tr>
+      <tr><td>Frontend</td><td>React 18 + TypeScript + Vite</td><td>Trading dashboard SPA</td></tr>
+      <tr><td>Charting</td><td>TradingView Lightweight Charts</td><td>Candlestick chart + indicator overlays</td></tr>
+      <tr><td>State Mgmt</td><td>Zustand + React Query</td><td>Client state + server data sync</td></tr>
+      <tr><td>AI Co-pilot</td><td>Anthropic Python SDK (claude-opus-4-8)</td><td>Market analysis chat</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ═══ SECTION 2 — Architecture ═══ -->
+  <div class="section-header" id="section-2">
+    <span class="section-number s2">2</span>
+    <h2 class="section-title">Architecture</h2>
+  </div>
+
+  <h3>Service Decomposition</h3>
+  <div class="mermaid">
+flowchart TD
+    subgraph Ingestion
+      MT5Feed[MT5 Price Feed\nService]
+      TVWebhook[TradingView\nWebhook Handler]
+    end
+    subgraph Bus
+      Redis[(Redis\nPub/Sub)]
+    end
+    subgraph Analysis
+      CandleProc[Candle Processor\npandas-ta]
+      SMCEngine[SMC Engine\nOB / FVG / BOS]
+      FibEngine[Fibonacci Engine]
+      VolProfile[Volume Profile]
+    end
+    subgraph Strategy
+      StratEval[Strategy Evaluator\nYAML rules engine]
+      RiskMgr[Risk Manager\ndaily cap / drawdown]
+      MoneyMgr[Money Manager\nlot sizing]
+    end
+    subgraph Execution
+      MT5Client[MT5 Client\norder / position]
+      OrderMgr[Order Manager]
+      GridMgr[Grid Manager]
+      Martingale[Martingale\nController]
+    end
+    subgraph Persistence
+      TimescaleDB[(TimescaleDB\nOHLCV + trades)]
+    end
+    subgraph Frontend
+      React[React Dashboard\nWebSocket]
+    end
+    MT5Feed --> Redis
+    TVWebhook --> Redis
+    Redis --> CandleProc
+    CandleProc --> SMCEngine
+    CandleProc --> FibEngine
+    CandleProc --> VolProfile
+    SMCEngine --> StratEval
+    FibEngine --> StratEval
+    VolProfile --> StratEval
+    CandleProc --> StratEval
+    StratEval --> RiskMgr
+    RiskMgr --> MoneyMgr
+    MoneyMgr --> OrderMgr
+    OrderMgr --> MT5Client
+    OrderMgr --> GridMgr
+    OrderMgr --> Martingale
+    MT5Client --> TimescaleDB
+    TimescaleDB --> React
+  </div>
+
+  <h3>Event Flow — Candle Close</h3>
+  <table>
+    <thead><tr><th>#</th><th>Step</th><th>Component</th><th>Output</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>MT5 tick detected — candle closed</td><td>MT5 Price Feed Service</td><td>Publish <code>candle.close</code> event to Redis</td></tr>
+      <tr><td>2</td><td>Consumer picks up event, builds OHLCV DataFrame</td><td>Candle Processor</td><td>Normalized DataFrame stored to TimescaleDB</td></tr>
+      <tr><td>3</td><td>Indicators computed on DataFrame</td><td>Analysis Engine</td><td>IndicatorSnapshot object</td></tr>
+      <tr><td>4</td><td>SMC zones recomputed from swing structure</td><td>SMC Engine</td><td>List of active OB / FVG / BOS zones</td></tr>
+      <tr><td>5</td><td>Fibonacci levels recomputed from swing high/low</td><td>Fibonacci Engine</td><td>FibLevels object</td></tr>
+      <tr><td>6</td><td>Strategies evaluated against combined snapshot</td><td>Strategy Evaluator</td><td>List of SignalEvents</td></tr>
+      <tr><td>7</td><td>Risk checks applied to each signal</td><td>Risk Manager</td><td>Approved or rejected signals</td></tr>
+      <tr><td>8</td><td>Lot size calculated for approved signals</td><td>Money Manager</td><td>OrderIntent objects</td></tr>
+      <tr><td>9</td><td>OrderIntent written to DB, then sent to MT5</td><td>Order Manager → MT5 Client</td><td>MT5 ticket number logged to DB</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Folder Structure</h3>
+  <pre><code>AITrading/
+├── backend/
+│   ├── app/
+│   │   ├── api/              ← FastAPI routers (candles, positions, trades, webhook, ws, ai)
+│   │   ├── core/             ← settings, Redis client, DB session, auth
+│   │   ├── models/           ← SQLAlchemy ORM models
+│   │   ├── schemas/          ← Pydantic v2 request/response models
+│   │   ├── repositories/     ← async DB access layer
+│   │   └── services/
+│   │       ├── market_data/  ← MT5 feed, OHLCV store
+│   │       ├── analysis/     ← MACD, EMA, Fibonacci, candle patterns, VPVR
+│   │       ├── smc/          ← Order Blocks, FVG, BOS/ChoCH, liquidity sweep
+│   │       ├── strategy/     ← YAML engine, risk manager, money management
+│   │       └── execution/    ← MT5 client, order/position manager, grid, martingale
+│   ├── strategies/           ← YAML strategy config files
+│   └── main.py
+├── frontend/
+│   └── src/
+│       ├── components/
+│       │   ├── chart/        ← TradingView Lightweight Charts wrapper + overlays
+│       │   ├── positions/    ← live positions panel
+│       │   ├── trades/       ← trade history table
+│       │   ├── analytics/    ← equity curve, drawdown chart
+│       │   └── ai/           ← Claude co-pilot chat panel
+│       ├── hooks/            ← useWebSocket, usePositions, useTrades, useChart
+│       ├── stores/           ← Zustand stores
+│       └── App.tsx
+└── docs/</code></pre>
+
+  <!-- ═══ SECTION 3 — Data Models ═══ -->
+  <div class="section-header" id="section-3">
+    <span class="section-number s3">3</span>
+    <h2 class="section-title">Data Models</h2>
+  </div>
+
+  <h3>TimescaleDB Tables</h3>
+
+  <h4>ohlcv_candles (hypertable — partitioned by time)</h4>
+  <table>
+    <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>time</td><td>TIMESTAMPTZ NOT NULL</td><td>Candle open time — partition key</td></tr>
+      <tr><td>symbol</td><td>VARCHAR(20) NOT NULL</td><td>e.g. XAUUSD, BTCUSD</td></tr>
+      <tr><td>timeframe</td><td>VARCHAR(5) NOT NULL</td><td>e.g. M1, H1, D1</td></tr>
+      <tr><td>open</td><td>NUMERIC(20,8)</td><td></td></tr>
+      <tr><td>high</td><td>NUMERIC(20,8)</td><td></td></tr>
+      <tr><td>low</td><td>NUMERIC(20,8)</td><td></td></tr>
+      <tr><td>close</td><td>NUMERIC(20,8)</td><td></td></tr>
+      <tr><td>volume</td><td>NUMERIC(20,8)</td><td></td></tr>
+      <tr><td>PRIMARY KEY</td><td>(time, symbol, timeframe)</td><td></td></tr>
+    </tbody>
+  </table>
+
+  <h4>trades</h4>
+  <table>
+    <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>id</td><td>UUID PRIMARY KEY</td><td>Internal trade ID</td></tr>
+      <tr><td>mt5_ticket</td><td>BIGINT</td><td>MT5 order ticket (null until filled)</td></tr>
+      <tr><td>symbol</td><td>VARCHAR(20)</td><td></td></tr>
+      <tr><td>strategy_id</td><td>VARCHAR(100)</td><td>YAML strategy name</td></tr>
+      <tr><td>direction</td><td>VARCHAR(4)</td><td>BUY or SELL</td></tr>
+      <tr><td>lot_size</td><td>NUMERIC(10,4)</td><td></td></tr>
+      <tr><td>entry_price</td><td>NUMERIC(20,8)</td><td></td></tr>
+      <tr><td>sl_price</td><td>NUMERIC(20,8)</td><td></td></tr>
+      <tr><td>tp_price</td><td>NUMERIC(20,8)</td><td></td></tr>
+      <tr><td>exit_price</td><td>NUMERIC(20,8)</td><td>Null if open</td></tr>
+      <tr><td>pnl_usd</td><td>NUMERIC(12,2)</td><td>Null if open</td></tr>
+      <tr><td>status</td><td>VARCHAR(20)</td><td>PENDING / OPEN / CLOSED / CANCELLED</td></tr>
+      <tr><td>entry_reason</td><td>JSONB</td><td>Indicator snapshot at entry</td></tr>
+      <tr><td>opened_at</td><td>TIMESTAMPTZ</td><td></td></tr>
+      <tr><td>closed_at</td><td>TIMESTAMPTZ</td><td>Null if open</td></tr>
+    </tbody>
+  </table>
+
+  <h4>risk_state (single-row state table)</h4>
+  <table>
+    <thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>date</td><td>DATE PRIMARY KEY</td><td>Calendar day</td></tr>
+      <tr><td>realized_pnl_usd</td><td>NUMERIC(12,2)</td><td>Cumulative realized P&L for the day</td></tr>
+      <tr><td>trading_halted</td><td>BOOLEAN</td><td>True when daily cap breached</td></tr>
+      <tr><td>peak_equity</td><td>NUMERIC(12,2)</td><td>For drawdown tracking</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Pydantic Schemas (key)</h3>
+  <pre><code>class CandleData(BaseModel):
+    time: datetime
+    symbol: str
+    timeframe: str
+    open: Decimal
+    high: Decimal
+    low: Decimal
+    close: Decimal
+    volume: Decimal
+
+class IndicatorSnapshot(BaseModel):
+    symbol: str
+    timeframe: str
+    timestamp: datetime
+    ema_20: float | None
+    ema_50: float | None
+    ema_200: float | None
+    macd_line: float | None
+    macd_signal: float | None
+    macd_hist: float | None
+    fib_levels: FibLevels | None
+    candle_pattern: str | None
+    smc_zones: list[SMCZone]
+    volume_profile: VolumeProfile | None
+
+class OrderIntent(BaseModel):
+    symbol: str
+    direction: Literal["BUY", "SELL"]
+    lot_size: float
+    entry_price: float | None   # None = market order
+    sl_price: float
+    tp_price: float
+    strategy_id: str
+    entry_reason: dict[str, Any]</code></pre>
+
+  <!-- ═══ SECTION 4 — API Specification ═══ -->
+  <div class="section-header" id="section-4">
+    <span class="section-number s4">4</span>
+    <h2 class="section-title">API Specification</h2>
+  </div>
+
+  <h3>Base URL</h3>
+  <p><code>http://localhost:8000/api/v1</code></p>
+
+  <h3>Authentication</h3>
+  <p>All endpoints except <code>/webhook/tradingview</code> require <code>Authorization: Bearer &lt;JWT&gt;</code>. Single-user JWT issued on login, configurable expiry (default 24h).</p>
+
+  <h3>Market Data</h3>
+  <div class="api-endpoint"><span class="badge badge-get">GET</span> /candles/{symbol}/{timeframe} — Query OHLCV history (params: from, to, limit)</div>
+  <div class="api-endpoint"><span class="badge badge-get">GET</span> /candles/{symbol}/{timeframe}/latest — Latest N candles</div>
+  <div class="api-endpoint"><span class="badge badge-get">GET</span> /indicators/{symbol}/{timeframe} — Current indicator snapshot</div>
+  <div class="api-endpoint"><span class="badge badge-get">GET</span> /smc/{symbol}/{timeframe} — Active SMC zones (OB, FVG, BOS)</div>
+
+  <h3>Positions &amp; Trades</h3>
+  <div class="api-endpoint"><span class="badge badge-get">GET</span> /positions — All open positions (real-time from MT5)</div>
+  <div class="api-endpoint"><span class="badge badge-del">DEL</span> /positions/{ticket} — Close specific position</div>
+  <div class="api-endpoint"><span class="badge badge-get">GET</span> /trades — Trade history (params: from, to, symbol, strategy_id, status)</div>
+  <div class="api-endpoint"><span class="badge badge-get">GET</span> /trades/{id} — Single trade detail including entry_reason snapshot</div>
+  <div class="api-endpoint"><span class="badge badge-get">GET</span> /performance — Aggregated stats (win rate, avg RR, equity curve data)</div>
+
+  <h3>Strategy Management</h3>
+  <div class="api-endpoint"><span class="badge badge-get">GET</span> /strategies — List loaded strategies with status (active/paused)</div>
+  <div class="api-endpoint"><span class="badge badge-post">POST</span> /strategies/{id}/activate — Activate strategy</div>
+  <div class="api-endpoint"><span class="badge badge-post">POST</span> /strategies/{id}/pause — Pause strategy</div>
+  <div class="api-endpoint"><span class="badge badge-post">POST</span> /strategies/reload — Hot-reload all YAML strategy files</div>
+
+  <h3>Risk Management</h3>
+  <div class="api-endpoint"><span class="badge badge-get">GET</span> /risk/state — Current daily loss, position count, halt status</div>
+  <div class="api-endpoint"><span class="badge badge-post">POST</span> /risk/reset-halt — Manually lift daily halt (requires confirmation)</div>
+
+  <h3>Webhook</h3>
+  <div class="api-endpoint"><span class="badge badge-post">POST</span> /webhook/tradingview — Receive Pine Script alerts (HMAC verified)</div>
+
+  <h3>AI Co-pilot</h3>
+  <div class="api-endpoint"><span class="badge badge-post">POST</span> /ai/analyze — Send chat message; streams back Claude response</div>
+  <div class="api-endpoint"><span class="badge badge-get">GET</span> /ai/daily-report — Trigger manual daily report generation</div>
+
+  <h3>WebSocket Endpoints</h3>
+  <table>
+    <thead><tr><th>Path</th><th>Message Type</th><th>Payload</th></tr></thead>
+    <tbody>
+      <tr><td><code>ws://localhost:8000/ws/prices</code></td><td>tick_update</td><td>{symbol, bid, ask, time}</td></tr>
+      <tr><td><code>ws://localhost:8000/ws/positions</code></td><td>position_update</td><td>{ticket, symbol, pnl, ...}</td></tr>
+      <tr><td><code>ws://localhost:8000/ws/signals</code></td><td>signal_fired / signal_rejected</td><td>{strategy_id, symbol, reason}</td></tr>
+    </tbody>
+  </table>
+
+  <h3>TradingView Webhook Payload</h3>
+  <pre><code>{
+  "symbol": "XAUUSD",
+  "action": "BUY",          // BUY | SELL | CLOSE_ALL
+  "price": 2350.50,
+  "strategy_id": "tv_ema_cross",
+  "timeframe": "H1",
+  "timestamp": "2026-06-09T10:00:00Z"
+}</code></pre>
+
+  <!-- ═══ SECTION 5 — Analysis Engine ═══ -->
+  <div class="section-header" id="section-5">
+    <span class="section-number s5">5</span>
+    <h2 class="section-title">Analysis Engine Specification</h2>
+  </div>
+
+  <h3>5.1 MACD</h3>
+  <p>Computed via <code>pandas_ta.macd(close, fast=12, slow=26, signal=9)</code>. Output: MACD line, signal line, histogram. Signal states: <em>bullish_cross</em> (MACD crosses above signal), <em>bearish_cross</em>, <em>bullish</em> (histogram positive), <em>bearish</em>.</p>
+
+  <h3>5.2 EMA</h3>
+  <p>Computed via <code>pandas_ta.ema(close, length=N)</code> for each configured period. Cross detection compares last two values: if EMA_fast[i] &gt; EMA_slow[i] and EMA_fast[i-1] &lt; EMA_slow[i-1] → bullish_cross.</p>
+
+  <h3>5.3 Fibonacci Retracement</h3>
+  <p>Swing high/low identified using <code>pandas_ta.swing_analysis</code> on a configurable lookback period (default: 20 candles). Standard levels: 0, 23.6, 38.2, 50, 61.8, 78.6, 100%. Level price = swing_high - (range × ratio). Recomputed per candle close only.</p>
+
+  <h3>5.4 Fibonacci Time Zones</h3>
+  <p>From a reference swing start candle index, project future candle indices at Fibonacci multiples: 1, 2, 3, 5, 8, 13, 21, 34... of the reference swing duration. Output: list of future bar timestamps that are Fibonacci time projections.</p>
+
+  <h3>5.5 Volume Profile (VPVR)</h3>
+  <p>Aggregates volume by price level over configurable window (default: 200 candles). Divides price range into 50 bins. Identifies Point of Control (POC), Value Area High (VAH), Value Area Low (VAL) using 70% volume rule. Implemented as <code>VolumeProfileService</code> — no external library dependency.</p>
+
+  <h3>5.6 SMC — Order Blocks</h3>
+  <p>Bullish Order Block: last bearish candle before a bullish Break of Structure. Valid while price has not traded back through its midpoint. Bearish Order Block: mirror logic. Algorithm:</p>
+  <ol>
+    <li>Detect BOS (price closes above/below last swing high/low)</li>
+    <li>Look back for the last opposing candle before the BOS candle</li>
+    <li>Store OB zone as {high, low, direction, valid: True}</li>
+    <li>Invalidate OB when price closes through the 50% level of the zone</li>
+  </ol>
+
+  <h3>5.7 SMC — Fair Value Gaps (FVG)</h3>
+  <p>Detected when candle[i].low &gt; candle[i-2].high (bullish FVG) or candle[i].high &lt; candle[i-2].low (bearish FVG). The gap zone = {top, bottom, direction}. FVG considered filled when price trades into the zone. Partial fill tracked when price partially enters the zone.</p>
+
+  <h3>5.8 SMC — BOS / ChoCH</h3>
+  <p>BOS: price closes beyond a prior swing in the same direction as trend. ChoCH: first BOS in the opposing direction. Swing structure maintained as sorted list of swing highs/lows. Market structure state: BULLISH | BEARISH | RANGING, updated on each BOS/ChoCH detection.</p>
+
+  <h3>5.9 Liquidity Sweeps</h3>
+  <p>SSL Sweep: candle wick extends below prior swing low then closes above it (liquidity taken, then rejection). BSL Sweep: mirror. Detection: candle.low &lt; prior_swing_low AND candle.close &gt; prior_swing_low. Output event: <code>LiquiditySweepEvent</code> with direction, swept_level, candle timestamp.</p>
+
+  <h3>5.10 Candlestick Patterns</h3>
+  <p>Detected using TA-Lib CDL functions on last 3 candles. Supported patterns:</p>
+  <ul>
+    <li>Hammer / Inverted Hammer</li>
+    <li>Bullish / Bearish Engulfing</li>
+    <li>Doji (standard + gravestone + dragonfly)</li>
+    <li>Morning Star / Evening Star</li>
+    <li>Pin Bar (wick &gt; 2× body, close in top/bottom 25%)</li>
+    <li>Shooting Star</li>
+  </ul>
+
+  <h3>5.11 Wick Fill</h3>
+  <p>Identifies candle wicks that point to unfilled price areas. A wick fill setup exists when: (1) prior candle has a prominent wick (wick ≥ 2× body), (2) the wick area has not been revisited in the last N candles, (3) current price is approaching the wick level from the opposite side.</p>
+
+  <h3>5.12 Stop Loss Sweep Detection</h3>
+  <p>Detects classic stop hunt pattern: (1) price makes new swing low/high (triggers stops), (2) strong rejection candle forms, (3) price closes back above/below the sweep level. Reported as <code>SLSweepEvent</code> for strategy entry triggers.</p>
+
+  <!-- ═══ SECTION 6 — Strategy Engine ═══ -->
+  <div class="section-header" id="section-6">
+    <span class="section-number s6">6</span>
+    <h2 class="section-title">Strategy Engine Specification</h2>
+  </div>
+
+  <h3>YAML Strategy Config Schema</h3>
+  <pre><code>strategy: string           # unique strategy ID
+symbol: string             # XAUUSD | EURUSD | BTCUSD | ...
+timeframe: string          # M1 | M5 | M15 | H1 | H4 | D1
+enabled: bool              # default true
+
+entry:
+  conditions:
+    - type: ema_cross      # ema_cross | macd_signal | fib_zone | smc_ob |
+                           #   smc_fvg | smc_bos | candle_pattern |
+                           #   sl_sweep | wick_fill | volume_profile_poc
+      fast: int            # (ema_cross only)
+      slow: int            # (ema_cross only)
+      direction: string    # bullish | bearish
+      levels: list[float]  # (fib_zone only)
+      zone: string         # support | resistance (fib_zone)
+      pattern: string      # (candle_pattern only)
+  logic: AND | OR
+
+exit:
+  conditions:              # same condition types as entry
+    - type: ...
+  logic: AND | OR
+
+risk:
+  method: fixed_lot | fixed_fractional | kelly
+  lot_size: float          # (fixed_lot only)
+  risk_pct: float          # (fixed_fractional + kelly)
+  win_rate: float          # (kelly only — from backtest)
+  reward_risk_ratio: float # (kelly only)
+  stop_loss_pips: int
+  take_profit_pips: int
+  trailing_stop: bool
+  trailing_stop_pips: int
+  max_open_positions: int  # per symbol override
+  max_daily_loss_usd: float
+
+execution_mode: normal | grid | martingale | hedge
+
+grid:                      # (grid mode only)
+  spacing_pips: int
+  levels: int
+  lot_size_per_level: float
+
+martingale:                # (martingale mode only)
+  multiplier: float        # lot multiplier per loss
+  max_multiplier: float    # REQUIRED — hard cap
+  max_lot_size: float      # REQUIRED — absolute maximum lot
+  reset_on_profit: bool</code></pre>
+
+  <h3>Condition Evaluator Logic</h3>
+  <p>Strategy evaluator receives an <code>IndicatorSnapshot</code> and evaluates each condition against it. Conditions return True/False. Combined with logic AND (all must pass) or OR (any must pass). If combined result is True, a <code>SignalEvent</code> is emitted.</p>
+
+  <h3>Money Management Algorithms</h3>
+  <table>
+    <thead><tr><th>Method</th><th>Algorithm</th></tr></thead>
+    <tbody>
+      <tr><td>Fixed Lot</td><td><code>lot = config.lot_size</code></td></tr>
+      <tr><td>Fixed Fractional</td><td><code>lot = (account_balance × risk_pct%) / (sl_pips × pip_value)</code></td></tr>
+      <tr><td>Kelly Criterion</td><td><code>kelly_f = win_rate - (1-win_rate)/rr_ratio; lot = account_balance × kelly_f × 0.5 / (sl_pips × pip_value)</code><br>Half-Kelly applied for safety. Min lot 0.01.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>News Trading Mode</h3>
+  <p>When a strategy has <code>news_filter: true</code>, the strategy engine checks the economic calendar before each signal emission. High-impact events within ±30 minutes (configurable) of the current time cause signal suppression. Post-event re-entry can be triggered on first candle close after event window.</p>
+
+  <h3>HFT Scalping Mode</h3>
+  <p>When <code>execution_mode: hft</code>, strategy evaluates on every MT5 tick rather than candle close. Signal conditions limited to price-action-only (no MACD/EMA recompute per tick — too slow). Tick-level SL/TP in points. Max position duration enforced (configurable, default 60s).</p>
+
+  <!-- ═══ SECTION 7 — Execution Engine ═══ -->
+  <div class="section-header" id="section-7">
+    <span class="section-number s7">7</span>
+    <h2 class="section-title">Execution Engine Specification</h2>
+  </div>
+
+  <h3>MT5 Client</h3>
+  <p>Wraps MetaTrader5 Python library. Key methods:</p>
+  <pre><code>class MT5Client:
+    async def connect(self) -> bool
+    async def get_account_info(self) -> AccountInfo
+    async def get_symbol_info(self, symbol: str) -> SymbolInfo
+    async def get_latest_candles(self, symbol: str, timeframe: str, n: int) -> list[CandleData]
+    async def place_market_order(self, intent: OrderIntent) -> MT5OrderResult
+    async def place_pending_order(self, intent: OrderIntent) -> MT5OrderResult
+    async def close_position(self, ticket: int) -> MT5OrderResult
+    async def modify_sl_tp(self, ticket: int, sl: float, tp: float) -> bool
+    async def get_open_positions(self) -> list[Position]</code></pre>
+
+  <h3>Order Manager</h3>
+  <p>Receives <code>OrderIntent</code> from Money Manager. Sequence:</p>
+  <ol>
+    <li>Write OrderIntent to <code>trades</code> table with status PENDING</li>
+    <li>Call MT5Client.place_market_order</li>
+    <li>On success: update trade record with mt5_ticket, status → OPEN</li>
+    <li>On failure: update trade record status → CANCELLED, log error</li>
+    <li>Start trailing stop monitor if configured</li>
+  </ol>
+
+  <h3>Grid Manager</h3>
+  <p>Maintains a grid state per strategy instance:</p>
+  <ul>
+    <li>Grid initialized at first signal — base price set, N levels above/below calculated</li>
+    <li>Each level tracked: price, direction, lot_size, status (pending/filled/closed)</li>
+    <li>On price reaching a level: place corresponding order</li>
+    <li>On grid level fill: re-place at next outer level (infinite grid) or stop at max_levels</li>
+    <li>Grid state persisted in Redis for crash recovery</li>
+  </ul>
+
+  <h3>Risk Manager Hard Limits</h3>
+  <div class="card critical">
+    <p>These checks run before every order — never bypassed:</p>
+    <ul>
+      <li>Daily loss cap: if <code>risk_state.trading_halted = true</code> → reject all new orders</li>
+      <li>Max open positions: if open count ≥ limit → reject (per symbol and global)</li>
+      <li>MT5 disconnected: if <code>mt5_client.connected = false</code> → reject and alert</li>
+      <li>Max lot size: lot capped at symbol max lot regardless of money management output</li>
+    </ul>
+  </div>
+
+  <!-- ═══ SECTION 8 — Frontend Specification ═══ -->
+  <div class="section-header" id="section-8">
+    <span class="section-number s8">8</span>
+    <h2 class="section-title">Frontend Specification</h2>
+  </div>
+
+  <h3>Page Layout</h3>
+  <table>
+    <thead><tr><th>Zone</th><th>Component</th><th>Content</th></tr></thead>
+    <tbody>
+      <tr><td>Header</td><td>AppHeader</td><td>Logo, symbol selector, timeframe selector, system status indicator (MT5 connected / halted)</td></tr>
+      <tr><td>Main — Left</td><td>ChartPanel (70% width)</td><td>TradingView Lightweight Charts candlestick + EMA + MACD + Fibonacci overlays + SMC zone markers</td></tr>
+      <tr><td>Main — Right</td><td>PositionPanel (30% width)</td><td>Live open positions with floating P&L updated via WebSocket</td></tr>
+      <tr><td>Bottom Drawer</td><td>TabPanel (resizable)</td><td>Tabs: Trade History | Analytics | Strategies | AI Co-pilot</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Chart Overlays</h3>
+  <ul>
+    <li>EMA lines: 20 (blue), 50 (orange), 200 (red) — toggle per line</li>
+    <li>MACD: separate pane below chart (histogram + line + signal)</li>
+    <li>Fibonacci levels: horizontal lines with percentage labels</li>
+    <li>SMC Order Blocks: semi-transparent rectangles (green = bullish, red = bearish)</li>
+    <li>SMC FVG zones: lighter rectangles between wick extremes</li>
+    <li>BOS/ChoCH markers: triangle markers on the candle that broke structure</li>
+    <li>Volume Profile: horizontal bars on chart right edge (value area highlighted)</li>
+  </ul>
+
+  <h3>WebSocket Events Consumed</h3>
+  <table>
+    <thead><tr><th>Event</th><th>Handler</th></tr></thead>
+    <tbody>
+      <tr><td>tick_update</td><td>Update chart's last candle, update header bid/ask</td></tr>
+      <tr><td>position_update</td><td>Refresh positions panel P&L values</td></tr>
+      <tr><td>signal_fired</td><td>Toast notification: "Strategy X: BUY XAUUSD triggered"</td></tr>
+      <tr><td>signal_rejected</td><td>Toast warning: "Strategy X rejected — daily cap reached"</td></tr>
+      <tr><td>candle_close</td><td>Append new candle to chart, trigger indicator overlay refresh</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Claude AI Co-pilot Panel</h3>
+  <p>Chat interface with streaming response via <code>POST /api/v1/ai/analyze</code>. System prompt injects current indicator snapshot + active positions + account state. User messages saved to conversation history (session-scoped). Supports markdown rendering in responses (tables, code blocks).</p>
+
+  <!-- ═══ SECTION 9 — Security ═══ -->
+  <div class="section-header" id="section-9">
+    <span class="section-number s9">9</span>
+    <h2 class="section-title">Security Specification</h2>
+  </div>
+
+  <table>
+    <thead><tr><th>Area</th><th>Control</th><th>Implementation</th></tr></thead>
+    <tbody>
+      <tr><td>API Auth</td><td>JWT Bearer token</td><td>PyJWT, HS256, 24h expiry, issued on /auth/login</td></tr>
+      <tr><td>Webhook Auth</td><td>HMAC-SHA256 signature</td><td>X-Signature header verified against TRADINGVIEW_WEBHOOK_SECRET</td></tr>
+      <tr><td>Secrets</td><td>.env file, never logged</td><td>pydantic-settings reads from env; MT5 creds never in API response</td></tr>
+      <tr><td>Input validation</td><td>Pydantic v2 strict mode</td><td>All request bodies validated; path params type-checked</td></tr>
+      <tr><td>SQL injection</td><td>SQLAlchemy parameterized queries</td><td>No raw SQL string concatenation</td></tr>
+      <tr><td>CORS</td><td>Localhost only</td><td>FastAPI CORS middleware: origins=["http://localhost:5173"]</td></tr>
+      <tr><td>Rate limiting</td><td>AI endpoint throttled</td><td>SlowAPI: 10 req/min on /ai/* endpoints</td></tr>
+      <tr><td>MT5 safety</td><td>Demo mode default</td><td>TRADING_MODE env var must be explicitly set to "live"</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ═══ SECTION 10 — Tech Stack ═══ -->
+  <div class="section-header" id="section-10">
+    <span class="section-number s10">10</span>
+    <h2 class="section-title">Tech Stack &amp; Dependencies</h2>
+  </div>
+
+  <h3>Backend Python Dependencies</h3>
+  <table>
+    <thead><tr><th>Package</th><th>Version</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>fastapi</td><td>^0.111</td><td>ASGI web framework</td></tr>
+      <tr><td>uvicorn[standard]</td><td>^0.30</td><td>ASGI server</td></tr>
+      <tr><td>pydantic</td><td>v2</td><td>Request/response schemas, settings</td></tr>
+      <tr><td>sqlalchemy</td><td>^2.0</td><td>Async ORM</td></tr>
+      <tr><td>asyncpg</td><td>^0.29</td><td>Async PostgreSQL driver</td></tr>
+      <tr><td>alembic</td><td>^1.13</td><td>DB migrations</td></tr>
+      <tr><td>redis[hiredis]</td><td>^5.0</td><td>Pub/sub + cache</td></tr>
+      <tr><td>MetaTrader5</td><td>^5.0</td><td>MT5 Python library (Windows only)</td></tr>
+      <tr><td>pandas</td><td>^2.2</td><td>OHLCV DataFrames</td></tr>
+      <tr><td>pandas-ta</td><td>^0.3</td><td>Technical indicators (MACD, EMA)</td></tr>
+      <tr><td>TA-Lib</td><td>^0.4</td><td>Candlestick pattern recognition</td></tr>
+      <tr><td>anthropic</td><td>^0.28</td><td>Claude AI SDK</td></tr>
+      <tr><td>PyJWT</td><td>^2.8</td><td>JWT auth tokens</td></tr>
+      <tr><td>slowapi</td><td>^0.1</td><td>Rate limiting</td></tr>
+      <tr><td>apscheduler</td><td>^3.10</td><td>Cron jobs (daily report)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Frontend Dependencies</h3>
+  <table>
+    <thead><tr><th>Package</th><th>Version</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>react</td><td>^18</td><td>UI framework</td></tr>
+      <tr><td>typescript</td><td>^5</td><td>Type safety</td></tr>
+      <tr><td>vite</td><td>^5</td><td>Build tool + dev server</td></tr>
+      <tr><td>lightweight-charts</td><td>^4</td><td>TradingView chart component</td></tr>
+      <tr><td>zustand</td><td>^4</td><td>Client state management</td></tr>
+      <tr><td>@tanstack/react-query</td><td>^5</td><td>Server data fetching + caching</td></tr>
+      <tr><td>tailwindcss</td><td>^3</td><td>Utility CSS</td></tr>
+      <tr><td>react-hot-toast</td><td>^2</td><td>Toast notifications</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Infrastructure</h3>
+  <table>
+    <thead><tr><th>Service</th><th>Hosting</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>TimescaleDB</td><td>Docker (same Windows host)</td><td>Port 5432, volume-mounted data dir</td></tr>
+      <tr><td>Redis</td><td>Docker (same Windows host)</td><td>Port 6379, no persistence needed (bus only)</td></tr>
+      <tr><td>FastAPI backend</td><td>Windows native Python</td><td>Required — MT5 lib is Windows-only</td></tr>
+      <tr><td>React frontend</td><td>Vite dev server / nginx on build</td><td>Port 5173 (dev)</td></tr>
+    </tbody>
+  </table>
+
+</main>
+
+<script>
+  function toggleTheme() {
+    var html = document.documentElement;
+    var isDark = html.getAttribute('data-theme') === 'dark';
+    if (isDark) { html.removeAttribute('data-theme');localStorage.setItem('docportal-theme','light');document.getElementById('themeIcon').innerHTML='&#9788;'; }
+    else { html.setAttribute('data-theme','dark');localStorage.setItem('docportal-theme','dark');document.getElementById('themeIcon').innerHTML='&#9790;'; }
+  }
+  (function() { var saved=localStorage.getItem('docportal-theme');if(saved==='dark'){document.documentElement.setAttribute('data-theme','dark');document.getElementById('themeIcon').innerHTML='&#9790;';} })();
+  const sections=document.querySelectorAll('.section-header[id]');
+  const tocLinks=document.querySelectorAll('.toc-link');
+  const content=document.querySelector('.doc-content');
+  content.addEventListener('scroll',()=>{let current='';sections.forEach(s=>{const top=s.offsetTop-content.offsetTop-100;if(content.scrollTop>=top)current=s.id;});tocLinks.forEach(l=>{l.classList.remove('active');if(l.getAttribute('href')==='#'+current)l.classList.add('active');});});
+  tocLinks.forEach(l=>{l.addEventListener('click',e=>{e.preventDefault();const t=document.querySelector(l.getAttribute('href'));if(t)content.scrollTo({top:t.offsetTop-content.offsetTop-20,behavior:'smooth'});});});
+</script>
+</body>
+</html>
