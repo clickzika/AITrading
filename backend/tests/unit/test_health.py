@@ -1,5 +1,14 @@
 from __future__ import annotations
 
+import os
+os.environ.setdefault("MT5_MOCK", "true")
+os.environ.setdefault("JWT_SECRET_KEY", "test-secret")
+os.environ.setdefault("TRADER_PASSWORD", "test")
+os.environ.setdefault("DATABASE_URL", "postgresql+asyncpg://u:p@localhost/test")
+os.environ.setdefault("REDIS_URL", "redis://localhost:6379/0")
+os.environ.setdefault("POSTGRES_PASSWORD", "test")
+os.environ.setdefault("REDIS_PASSWORD", "test")
+
 import pytest
 from httpx import ASGITransport, AsyncClient
 

@@ -117,10 +117,10 @@ class MT5Client:
             logger.info("MT5 circuit → CLOSED")
 
     def get_tick(self, symbol: str) -> TickData | None:
-        if _MOCK:
-            return TickData(symbol=symbol, bid=2341.10, ask=2341.40, time=0.0)
         if self.circuit_state() == CircuitState.OPEN:
             return None
+        if _MOCK:
+            return TickData(symbol=symbol, bid=2341.10, ask=2341.40, time=0.0)
         try:
             tick = _mt5.symbol_info_tick(symbol)
             if tick is None:

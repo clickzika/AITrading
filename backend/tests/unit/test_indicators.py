@@ -71,8 +71,8 @@ def test_macd_signal_bullish_cross() -> None:
 class TestFibonacci:
     def test_retracement_bullish(self) -> None:
         result = compute_retracement(2370.0, 2300.0, "bullish")
-        assert result["0"] == pytest.approx(2370.0, rel=1e-3)
-        assert result["100"] == pytest.approx(2300.0, rel=1e-3)
+        assert result["0.0"] == pytest.approx(2370.0, rel=1e-3)
+        assert result["100.0"] == pytest.approx(2300.0, rel=1e-3)
         assert result["61.8"] == pytest.approx(2370.0 - 70.0 * 0.618, rel=1e-3)
 
     def test_retracement_level_precision_xauusd(self) -> None:

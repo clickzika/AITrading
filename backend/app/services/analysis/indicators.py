@@ -1,7 +1,37 @@
 from __future__ import annotations
 
 import pandas as pd
-import pandas_ta as ta
+
+try:
+    import pandas_ta as ta
+    _HAS_PANDAS_TA = True
+except (ImportError, ModuleNotFoundError):
+    ta = None  # type: ignore[assignment]
+    _HAS_PANDAS_TA = False
+
+
+def _ema_series(close: pd.Series, period: int) -> pd.Series:
+    if _HAS_PANDAS_TA and ta is not None:
+        return ta.ema(close, length=period)
+    return close.ewm(span=period, adjust=False).mean()
+
+
+def _macd_series(
+    close: pd.Series, fast: int, slow: int, signal: int
+) -> tuple[pd.Series, pd.Series, pd.Series]:
+    if _HAS_PANDAS_TA and ta is not None:
+        macd_df = ta.macd(close, fast=fast, slow=slow, signal=signal)
+        col_m = f"MACD_{fast}_{slow}_{signal}"
+        col_s = f"MACDs_{fast}_{slow}_{signal}"
+        col_h = f"MACDh_{fast}_{slow}_{signal}"
+        return macd_df[col_m], macd_df[col_s], macd_df[col_h]
+    # Pure-pandas fallback
+    ema_fast = close.ewm(span=fast, adjust=False).mean()
+    ema_slow = close.ewm(span=slow, adjust=False).mean()
+    macd_line = ema_fast - ema_slow
+    signal_line = macd_line.ewm(span=signal, adjust=False).mean()
+    histogram = macd_line - signal_line
+    return macd_line, signal_line, histogram
 
 
 def compute_ema(df: pd.DataFrame, periods: list[int] | None = None) -> dict[str, list[float]]:
@@ -12,7 +42,7 @@ def compute_ema(df: pd.DataFrame, periods: list[int] | None = None) -> dict[str,
         raise ValueError(f"Need at least {max(periods)} candles for EMA-{max(periods)}")
     result: dict[str, list[float]] = {}
     for p in periods:
-        series = ta.ema(df["close"], length=p)
+        series = _ema_series(df["close"], p)
         result[f"ema{p}"] = series.round(5).tolist()
     return result
 
@@ -24,11 +54,11 @@ def compute_macd(
     signal: int = 9,
 ) -> dict[str, list[float]]:
     """Compute MACD. Returns macd_line, signal_line, histogram."""
-    macd_df = ta.macd(df["close"], fast=fast, slow=slow, signal=signal)
+    macd_line, signal_line, histogram = _macd_series(df["close"], fast, slow, signal)
     return {
-        "macd_line": macd_df[f"MACD_{fast}_{slow}_{signal}"].round(6).tolist(),
-        "signal_line": macd_df[f"MACDs_{fast}_{slow}_{signal}"].round(6).tolist(),
-        "histogram": macd_df[f"MACDh_{fast}_{slow}_{signal}"].round(6).tolist(),
+        "macd_line": macd_line.round(6).tolist(),
+        "signal_line": signal_line.round(6).tolist(),
+        "histogram": histogram.round(6).tolist(),
     }
 
 

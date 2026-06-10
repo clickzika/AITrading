@@ -30,6 +30,15 @@ def create_access_token(sub: str = "trader") -> str:
     )
 
 
+def decode_token(token: str) -> str | None:
+    """Decode JWT and return subject, or None if invalid. Used by WebSocket auth."""
+    try:
+        payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm])
+        return payload.get("sub")
+    except JWTError:
+        return None
+
+
 async def get_current_user(token: str = Depends(_oauth2)) -> str:
     exc = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
